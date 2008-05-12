@@ -2,6 +2,7 @@
 \alias{Math.polynom}
 \alias{Math.polylist}
 \alias{Ops.polynom}
+\alias{Ops.polylist}
 \alias{Summary.polynom}
 \alias{Summary.polylist}
 
@@ -40,10 +41,11 @@
 }
 \details{
   None of these functions is called directly.  \code{Ops.polynom} is the
-  workhorse of the entire package.
+  workhorse of the entire package.  \code{Ops.polylist} allows
+  vectorised arithmetic computations on \code{polylist}s.
 }
 \value{
-  A \code{polynom} object giving the result of the operation.
+  A \code{polynom} (or \code{polylist}) object giving the result of the operation.
 }
 \references{ None }
 \author{Bill Venables, with some code provided by Kurt Hornik }

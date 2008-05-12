@@ -1,4 +1,4 @@
-### revision of the polynomial class with a different representation
+## revision of the polynomial class with a different representation
 
 polynom <- 
 ### constructor function
@@ -27,23 +27,29 @@ is.polynom <-
 function(a)
   inherits(a, "polynom")
 
-.poly.mult <- local({
-### workhorse for convolutions 
-  .pm <- function(e1, e2, l1, l2) {
-    r <- numeric(l1 + l2 -1)
-    ij <- 1:l2
-    for(e in e1) {
-      r[ij] <- r[ij] + e*e2
-      ij <- ij + 1
-    }
-    r
-  }  
-  function(e1, e2, l1, l2) {
-    if(l1 == 1 || l2 == 1) return(e1 * e2) 
-    if(l1 < l2) .pm(e1, e2, l1, l2) else 
-                .pm(e2, e1, l2, l1)
-    }
-}) 
+## .poly.mult <- local({
+## ### workhorse for convolutions 
+##   .pm <- function(e1, e2, l1, l2) {
+##     r <- numeric(l1 + l2 -1)
+##     ij <- 1:l2
+##     for(e in e1) {
+##       r[ij] <- r[ij] + e*e2
+##       ij <- ij + 1
+##     }
+##     r
+##   }  
+##   function(e1, e2, l1, l2) {
+##     if(l1 == 1 || l2 == 1) return(e1 * e2) 
+##     if(l1 < l2) .pm(e1, e2, l1, l2) else 
+##                 .pm(e2, e1, l2, l1)
+##     }
+## })
+
+.poly.mult <- function(e1, e2, l1, l2) 
+   .C("poly_mult",
+     as.double(e1), as.integer(l1),
+     as.double(e2), as.integer(l2),
+     e12 = double(l1+l2-1), PACKAGE = "PolynomF")$e12
 
 .poly.quo <- function(e1, e2, l1, l2) {### quotient
   if(l2 == 0)
@@ -128,6 +134,21 @@ Ops.polynom <- function(e1, e2) {
          "!=" = return(l1 != l2 || any(e1 != e2)),
          stop("unsupported operation on polynoms"))
   polynom(e1.op.e2)
+}
+
+Ops.polylist <- function(e1, e2) {
+  if(missing(e2)) 
+    return(switch(.Generic,
+      "+" = e1,
+      "-" = as.polylist(lapply(e1, "-")),
+      stop("unknown unary operator!")))
+  switch(.Generic,
+  "+" =, "-" =, "*" =, "/" =, "%/%" =,
+  "%%" = as.polylist(mapply(.Generic, lapply(e1, as.polynom), lapply(e2, as.polynom))),
+  "^" = as.polylist(mapply(.Generic, lapply(e1, as.polynom), e2)),
+  "==" =,
+  "!=" = unlist(mapply(.Generic, lapply(e1, as.polynom), lapply(e2, as.polynom))),
+  stop("unsupported operation on polynoms"))
 }
 
 .accumulate <- function(f, init, x, right = TRUE) {
@@ -355,7 +376,7 @@ function(x, xlim = 0:1, ylim = range(Px), type = "l", xlab = "x",
   plot(cbind(x, Px), xlab = xlab, ylab = ylab, type = "n",
      xlim = xlim, ylim = ylim, ...)
   for(i in seq(along = p))
-    lines(p[[i]], lty = i, col = i)
+    lines(p[[i]], lty = i, col = i, ...)
   invisible()
 }
 
@@ -431,6 +452,12 @@ points.polynom <- function(x, ...,
   pu <- par("usr")
   points(at, p(at), ...)
 }
+
+lines.polylist <- function(x, ..., len = 1000)
+  for(i in seq(along = x)) lines(x[[i]], col = i, lty = i, len = len)
+
+points.polylist <- function(x, ..., len = 100)
+  for(i in seq(along = x)) points(x[[i]], pch = i, col = i, len = len)
 
 poly.calc <- function(x, y, 
       tol = sqrt(.Machine$double.eps), 

@@ -1,7 +1,9 @@
 \name{plot.polynom}
 \alias{plot.polynom}
 \alias{plot.polylist}
+\alias{lines.polylist}
 \alias{lines.polynom}
+\alias{points.polylist}
 \alias{points.polynom}
 
 \title{Graphical display of polynomial objects}
@@ -13,14 +15,17 @@
    xlab = "x", ylab = "p(x)", \dots, len = 1000)
 \method{plot}{polylist}(x, xlim = 0:1, ylim = range(Px), type = "l",
    xlab = "x", ylab = "P(x)", \dots, len = 1000)
+\method{lines}{polylist}(x, ..., len = 1000)
 \method{lines}{polynom}(x, ..., len = 1000)
+\method{points}{polylist}(x, ..., len = 100)
 \method{points}{polynom}(x, ..., at = seq(pu[1], pu[2], len = len), len = 100) 
 }
 
 \arguments{
   \item{x}{A \code{polynom} or \code{polylist} object. }
   \item{xlim, ylim, xlab, ylab, type}{As for \code{plot}. }
-  \item{\dots}{Additional arguments sent to \code{plot} or \code{lines} }
+  \item{\dots}{Additional arguments sent to \code{plot}, \code{points}
+or \code{lines} }
   \item{len}{The number of linear line segments to use to present
     the polynomial curve. }
   \item{at}{the $x-$values where the points are to appear.}
