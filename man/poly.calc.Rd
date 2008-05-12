@@ -68,7 +68,7 @@ poly.orth(x, degree = length(unique(x)) - 1, norm = TRUE)
 \seealso{\code{poly}}
 \examples{
 x <- polynom()
-H <- polylist(x^0, x)
+H <- polylist(1, x)
 for(j in 2:10)
   H[[j+1]] <- x*H[[j]] - (j-1)*H[[j-1]]
 Hf <- as.function(H)
