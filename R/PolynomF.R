@@ -380,11 +380,36 @@ function(x, xlim = 0:1, ylim = range(Px), type = "l", xlab = "x",
   invisible()
 }
 
+## print.polylist <- function(x, ...) {
+##   cat("List of polynomials:\n")
+##   y <- x
+##   x <- unclass(x)
+##   NextMethod("print", x, ...)
+##   invisible(y)
+## }
+
 print.polylist <- function(x, ...) {
-  cat("List of polynomials:\n")
   y <- x
   x <- unclass(x)
-  NextMethod()
+  cat("List of polynomials:\n")
+  if(length(x) > 0) {
+    nam <- names(x)
+    if(is.null(nam)) {
+      for(i in 1:length(x)) {
+        cat(paste("[[", i, "]]\n", sep=""))
+        print(x[[i]], ...)
+        cat("\n")
+      }
+    } else {
+      for(n in nam) {
+        cat(paste("$\"", n, "\"\n", sep=""))
+        print(x[[n]], ...)
+        cat("\n")
+      }
+    }
+  } else {
+    NextMethod("print", x, ...)
+  }  
   invisible(y)
 }
 
