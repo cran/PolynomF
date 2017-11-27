@@ -1,8 +1,7 @@
 ## revision of the polynomial class with a different representation
 
-polynom <- 
-### constructor function
-function(a = c(0,1), ..., eps = 0) {
+polynom <- function(a = c(0,1), ..., eps = 0) {
+  ### constructor function
   a <- as.numeric(a)
   if(any(is.na(a))) 
     stop("illegal coefficient vector")
@@ -16,34 +15,14 @@ function(a = c(0,1), ..., eps = 0) {
   }, class = "polynom")
 }    
 
-as.polynom <- 
-### coercion to polynom
-function(a)
+as.polynom <- function(a)
+  ### coercion to polynom
   if(is.polynom(a)) a else 
     polynom(as.vector(a))
 
-is.polynom <- 
-### predicate function
-function(a)
+is.polynom <- function(a)
+  ### predicate function
   inherits(a, "polynom")
-
-## .poly.mult <- local({
-## ### workhorse for convolutions 
-##   .pm <- function(e1, e2, l1, l2) {
-##     r <- numeric(l1 + l2 -1)
-##     ij <- 1:l2
-##     for(e in e1) {
-##       r[ij] <- r[ij] + e*e2
-##       ij <- ij + 1
-##     }
-##     r
-##   }  
-##   function(e1, e2, l1, l2) {
-##     if(l1 == 1 || l2 == 1) return(e1 * e2) 
-##     if(l1 < l2) .pm(e1, e2, l1, l2) else 
-##                 .pm(e2, e1, l2, l1)
-##     }
-## })
 
 .poly.mult <- function(e1, e2, l1, l2) 
    .C("poly_mult",
@@ -152,7 +131,7 @@ Ops.polylist <- function(e1, e2) {
 }
 
 .accumulate <- function(f, init, x, right = TRUE) {
-## .accumulate a la Abelson and Sussman.
+  ## .accumulate a la Abelson and Sussman.
   if(length(x) == 0)
     return(init)
   f <- match.fun(f)
@@ -166,56 +145,53 @@ Summary.polynom <- function(..., na.rm = FALSE) {
   ok <- switch(.Generic, sum = , prod = TRUE, FALSE)
   if(!ok)
     stop(gettextf("Generic '%s' not defined for '%s' objects.",
-            .Generic, .Class))
+                  .Generic, .Class))
   switch(.Generic,
-       "sum" = .accumulate("+", polynom(0), polylist(...)),
-       "prod" = .accumulate("*", polynom(1), polylist(...)))
+         "sum" = .accumulate("+", polynom(0), polylist(...)),
+         "prod" = .accumulate("*", polynom(1), polylist(...)))
 }
 
 Summary.polylist <- function(..., na.rm = FALSE) {
   ok <- switch(.Generic, sum = , prod = TRUE, FALSE)
   if(!ok)
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
-            .Generic, .Class))
+                  .Generic, .Class))
   switch(.Generic,
-       "sum" = .accumulate("+", polynom(0), c(...)),
-       "prod" = .accumulate("*", polynom(1), c(...)))
+         "sum" = .accumulate("+", polynom(0), c(...)),
+         "prod" = .accumulate("*", polynom(1), c(...)))
 }
 
-Math.polynom <-
-function(x, ...) {
+Math.polynom <- function(x, ...) {
   x <- coef(x)
   switch(.Generic,
-       round = ,
-       signif = ,
-       floor = ,
-       ceiling = ,
-       trunc = polynom(NextMethod(.Generic)),
-       stop(paste(.Generic, "unsupported for polynoms")))
+         round = ,
+         signif = ,
+         floor = ,
+         ceiling = ,
+         trunc = polynom(NextMethod(.Generic)),
+         stop(paste(.Generic, "unsupported for polynoms")))
 }
 
 Math.polylist <-
   function(x, ...) sapply(x, .Generic, ...)
 
-as.character.polynom <- 
-function(x, variable = "x", decreasing = FALSE, ...)
-{
+as.character.polynom <- function(x, variable = "x", decreasing = FALSE, ...) {
   if(is.polynom(x)) p <- coef(x) else p <- unclass(x)
   lp <- length(p) - 1
   names(p) <- 0:lp
   p <- p[p != 0]
-
+  
   if(length(p) == 0) return("0")
-
+  
   if(decreasing) p <- rev(p)
-
+  
   signs <- ifelse(p < 0, "- ", "+ ")
   signs[1] <- if(signs[1] == "- ") "-" else ""
-
+  
   np <- names(p)
   p <- as.character(abs(p))
   p[p == "1" & np != "0"] <- ""
-
+  
   pow <- paste(variable, "^", np, sep = "")
   pow[np == "0"] <- ""
   pow[np == "1"] <- variable
@@ -225,36 +201,35 @@ function(x, variable = "x", decreasing = FALSE, ...)
 }
 
 print.polynom <-
-function(x, variable = "x", 
-          digits = getOption("digits"), decreasing = FALSE, ...)
-{
-  x <- coef(x)
-  p <- as.character.polynom(signif(x, digits = digits), 
-              variable = variable, decreasing = decreasing, ...)
-  pc <- nchar(p)
-  ow <- max(35, getOption("width"))
-  m2 <- 0
-  while(m2 < pc) {
-    m1 <- m2 + 1
-    m2 <- min(pc, m2 + ow)
-    if(m2 < pc)
-      while(substring(p, m2, m2) != " " && m2 > m1 + 1)
-        m2 <- m2 - 1
-    cat(substring(p, m1, m2), "\n")
+  function(x, variable = "x", 
+           digits = getOption("digits"), decreasing = FALSE, ...) {
+    x <- coef(x)
+    p <- as.character.polynom(signif(x, digits = digits), 
+                              variable = variable, decreasing = decreasing, ...)
+    pc <- nchar(p)
+    ow <- max(35, getOption("width"))
+    m2 <- 0
+    while(m2 < pc) {
+      m1 <- m2 + 1
+      m2 <- min(pc, m2 + ow)
+      if(m2 < pc)
+        while(substring(p, m2, m2) != " " && m2 > m1 + 1)
+          m2 <- m2 - 1
+      cat(substring(p, m1, m2), "\n")
+    }
+    invisible(x)
   }
-  invisible(x)
-}
 
 as.function.polynom <- 
-function (x, variable = "x", ...) {
+  function (x, variable = "x", ...) {
     a <- rev(coef(x))
     w <- as.name("w")
     v <- as.name(variable)
     ex <- call("{", call("<-", w, 0))
     for (i in seq_along(a)) {
-        ex[[i + 2]] <- call("<-", w, 
-            call("+", a[1], call("*", v, w)))
-        a <- a[-1]
+      ex[[i + 2]] <- call("<-", w, 
+                          call("+", a[1], call("*", v, w)))
+      a <- a[-1]
     }
     ex[[length(ex) + 1]] <- w
     f <- quote(function(x) NULL)
@@ -262,16 +237,15 @@ function (x, variable = "x", ...) {
     f <- eval(f)
     body(f) <- ex
     f
-}
-                              
+  }
+
 coef.polynom <- function(object,...)
   get("a", envir = environment(object))
-  
+
 coef.polylist <- function(object, ...) 
   sapply(object, coef.polynom, ...)
 
 deriv.polynom <- function(expr, ...) {
-  stopifnot(require(stats))
   expr <- coef(expr)
   if(length(expr) == 1)
     return(polynom(0))
@@ -279,12 +253,11 @@ deriv.polynom <- function(expr, ...) {
   polynom(expr * seq(along = expr))
 }
 
-integral <- 
-function(expr, ...) UseMethod("integral")
+integral <- function(expr, ...) UseMethod("integral")
 
 integral.default <- function(expr, ...)
-stop(gettextf("No 'integral' method for objects of class '%s'",
-      class(expr)))
+  stop(gettextf("No 'integral' method for objects of class '%s'",
+                class(expr)))
 
 integral.polynom <- function(expr, limits = NULL, ...) {
   expr <- coef(expr)
@@ -295,9 +268,7 @@ integral.polynom <- function(expr, limits = NULL, ...) {
     diff(p(limits))
 }
 
-poly.orth <-
-function(x, degree = length(unique(x)) - 1, norm = TRUE)
-{
+poly.orth <- function(x, degree = length(unique(x)) - 1, norm = TRUE) {
   at <- attr(poly(x, degree), "coefs")
   a <- at$alpha
   N <- at$norm2
@@ -305,7 +276,7 @@ function(x, degree = length(unique(x)) - 1, norm = TRUE)
   p <- list(polynom(0), polynom(1))
   for(j in 1:degree)
     p[[j + 2]] <-
-      (x - a[j]) * p[[j + 1]] - N[j + 1]/N[j] * p[[j]]
+    (x - a[j]) * p[[j + 1]] - N[j + 1]/N[j] * p[[j]]
   p <- p[-1]
   if(norm) {
     sqrtN <- sqrt(N[-1])
@@ -315,44 +286,40 @@ function(x, degree = length(unique(x)) - 1, norm = TRUE)
   p
 }
 
-.polylist_from_list <-
-function(x)
+.polylist_from_list <- function(x)
   structure(lapply(x, as.polynom), class = "polylist")
 
-polylist <-
-function(...)
+## .polylist_from_list <- function(x)
+##   structure(lapply(c(x, recursive = TRUE), as.polynom), 
+##             class = "polylist")
+
+polylist <- function(...)
   .polylist_from_list(list(...))
 
 is.polylist <-
-function(x)
-  inherits(x, "polylist")
+  function(x)
+    inherits(x, "polylist")
 
-as.polylist <-
-function(x)
-{
+as.polylist <- function(x) {
   if(is.polylist(x)) x
   else if(is.list(x)) .polylist_from_list(x)
   else polylist(x)
 }
 
-deriv.polylist <-
-function(expr, ...) 
+deriv.polylist <- function(expr, ...) 
   structure(lapply(expr, deriv), class = class(expr))
 
-integral.polylist <-
-function(expr, ...)
-{
+integral.polylist <- function(expr, ...) {
   result <- lapply(expr, integral, ...)
   if (length(result) > 0 && is.polynom(result[[1]]))
     class(result) <- class(expr)
   result
 }
 
-plot.polylist <-
-function(x, xlim = 0:1, ylim = range(Px), type = "l", xlab = "x",
-          ylab = "P(x)", ..., len = 1000)
-{
-  p <- x                
+plot.polylist <- function(x, xlim = 0:1, ylim = range(Px), 
+                          type = "l", xlab = "x", ylab = "P(x)",
+                          ..., len = 1000) {
+  p <- x
   if(missing(xlim)) {
     ## try to cover the "interesting" region
     xlim <- range(Re(unlist(lapply(p, summary.polynom))))
@@ -374,7 +341,7 @@ function(x, xlim = 0:1, ylim = range(Px), type = "l", xlab = "x",
   if(!missing(ylim))
     Px[Px < ylim[1]] <- Px[Px > ylim[2]] <- NA
   plot(cbind(x, Px), xlab = xlab, ylab = ylab, type = "n",
-     xlim = xlim, ylim = ylim, ...)
+       xlim = xlim, ylim = ylim, ...)
   for(i in seq(along = p))
     lines(p[[i]], lty = i, col = i, ...)
   invisible()
@@ -413,10 +380,9 @@ print.polylist <- function(x, ...) {
   invisible(y)
 }
 
-c.polylist <-
-function(..., recursive = FALSE)
+c.polynom <- c.polylist <- function(..., recursive = FALSE)
   .polylist_from_list(unlist(lapply(list(...), as.polylist),
-                 recursive = FALSE))
+                             recursive = FALSE))
 
 "[.polylist" <- function(x, i)
   .polylist_from_list(NextMethod("["))
@@ -424,9 +390,12 @@ function(..., recursive = FALSE)
 rep.polylist <- function(x, times, ...)
   .polylist_from_list(NextMethod("rep"))
 
+rep.polynom <- function(x, times, ...)
+  rep.polylist(polylist(x), times, ...)
+
 unique.polylist <-
-function(x, incomparables = FALSE, ...)
-  .polylist_from_list(NextMethod("unique"))
+  function(x, incomparables = FALSE, ...)
+    .polylist_from_list(NextMethod("unique"))
 
 change.origin <- function(p, o, ...) UseMethod("change.origin")
 change.origin.default <- 
@@ -437,7 +406,8 @@ change.origin.polylist <- function(p, o, ...)
   structure(lapply(p, change.origin, o = o), class = "polylist")
 
 plot.polynom <- function(x, xlim = 0:1, ylim = range(Px), 
-     type = "l", xlab = "x", ylab = "p(x)", ..., len = 1000) {
+                         type = "l", xlab = "x", ylab = "p(x)", 
+                         ..., len = 1000) {
   p <- x                  
   if(missing(xlim))
     xlim <- range(c(0, Re(unlist(summary(p)))))
@@ -458,7 +428,7 @@ plot.polynom <- function(x, xlim = 0:1, ylim = range(Px),
   if(!missing(ylim))
     Px[Px < ylim[1]] <- Px[Px > ylim[2]] <- NA
   plot(x, Px, xlim = xlim, ylim = ylim, type = "n", 
-          xlab = xlab, ylab = ylab, ...)
+       xlab = xlab, ylab = ylab, ...)
   pu <- par("usr")
   x <- seq(pu[1], pu[2], len = len)
   lines(x, p(x), type = type, ...)
@@ -472,7 +442,7 @@ lines.polynom <- function(x, ..., len = 1000)  {
 }
 
 points.polynom <- function(x, ..., 
-    at = seq(pu[1], pu[2], len = len), len = 100)  {
+                           at = seq(pu[1], pu[2], len = len), len = 100)  {
   p <- x               
   pu <- par("usr")
   points(at, p(at), ...)
@@ -485,8 +455,8 @@ points.polylist <- function(x, ..., len = 100)
   for(i in seq(along = x)) points(x[[i]], pch = i, col = i, len = len)
 
 poly.calc <- function(x, y, 
-      tol = sqrt(.Machine$double.eps), 
-      lab = dimnames(y)[[2]]) { 
+                      tol = sqrt(.Machine$double.eps), 
+                      lab = dimnames(y)[[2]]) { 
   if(missing(y)) { ## case 1: polynomial from zeros
     p <- 1
     for(xi in x)
@@ -528,7 +498,7 @@ poly.from.values <- poly.calc
 
 predict.polynom <- function(object, newdata, ...) object(newdata)
 predict.polylist <- function(object, newdata, ...) 
-    sapply(object, function(x, .n) x(.n), .n = newdata)
+  sapply(object, function(x, .n) x(.n), .n = newdata)
 
 print.summary.polynom <- function(x, ...) {
   cat("\n Summary information for:\n")
@@ -554,61 +524,53 @@ solve.polynom <- function(a, b, ...) {
   else
     r <- numeric(0)
   switch(as.character(length(a)),
-       "0" =,
-       "1" = r,
-       "2" = sort(c(r,  - a[1]/a[2])),
-     {                                       
-	   a <- rev(a)
-	   a <- (a/a[1])[-1]
-	   M <- rbind( - a, cbind(diag(length(a) - 1), 0))     
-	   sort(c(r, eigen(M, symmetric = FALSE,
-               only.values = TRUE)$values))
-     })
+         "0" =,
+         "1" = r,
+         "2" = sort(c(r,  - a[1]/a[2])),
+         {                                       
+           a <- rev(a)
+           a <- (a/a[1])[-1]
+           M <- rbind( - a, cbind(diag(length(a) - 1), 0))     
+           sort(c(r, eigen(M, symmetric = FALSE,
+                           only.values = TRUE)$values))
+         })
 }
 
 solve.polylist <- function(a, b, ...) 
   if(!missing(b)) lapply(a, solve.polynom, b) else
     lapply(a, solve.polynom)
-    
-summary.polynom <-
-function(object, ...)
-{
+
+summary.polynom <- function(object, ...) {
   dp <- deriv(object)
   structure(list(zeros = solve(object),
-           stationaryPoints = solve(dp),
-           inflexionPoints = solve(deriv(dp))),
-        class = "summary.polynom",
-        originalPolynomial = object)
+                 stationaryPoints = solve(dp),
+                 inflexionPoints = solve(deriv(dp))),
+            class = "summary.polynom",
+            originalPolynomial = object)
 }
 
-summary.polylist <- 
-  function(object, ...) lapply(object, summary.polynom)
+summary.polylist <- function(object, ...) 
+  lapply(object, summary.polynom)
 
 .monic <- function(p) {
   a <- coef(p)
   polynom(a/a[length(a)])
 }
 
-.degree <-
-function(x)
+.degree <- function(x)
   length(coef(x)) - 1
 
-.effectively_zero <- 
-function (p, tolerance = .Machine$double.eps^0.5) 
-all(abs(coef(p)) < tolerance)
+.effectively_zero <- function (p, 
+                               tolerance = .Machine$double.eps^0.5) 
+  all(abs(coef(p)) < tolerance)
 
-
-.GCD2 <-
-function(x, y)
-{
+.GCD2 <- function(x, y) {
   if(.effectively_zero(y)) x
   else if(.degree(y) == 0) polynom(1)
   else Recall(y, x %% y)
 }
 
-.LCM2 <-
-function(x, y)
-{
+.LCM2 <- function(x, y) {
   if(.effectively_zero(x) || .effectively_zero(y))
     return(polynom(0))
   (x / .GCD2(x, y)) * y
@@ -624,7 +586,7 @@ GCD.polynom <- function(...) {
   .monic(.accumulate(.GCD2, args[[1]], args[-1], FALSE))
 }
 GCD.polylist <- GCD.polynom
-                        
+
 LCM <- function(...)
   UseMethod("LCM")
 
@@ -641,5 +603,3 @@ as.function.polylist <- function(x, ...) {
   x <- lapply(x, as.function.polynom)
   function(z, ...) sapply(x, function(p) p(z), ...)
 }  
-  
-  

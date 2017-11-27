@@ -1,6 +1,8 @@
 \name{c.polylist}
 \alias{c.polylist}
+\alias{c.polynom}
 \alias{rep.polylist}
+\alias{rep.polynom}
 \alias{unique.polylist}
 \title{Utility methods for manipulating polylist objects }
 \description{
@@ -9,7 +11,9 @@
 }
 \usage{
 \method{c}{polylist}(\dots, recursive = FALSE)
+\method{c}{polynom}(\dots, recursive = FALSE)
 \method{rep}{polylist}(x, times, \dots)
+\method{rep}{polynom}(x, times, \dots)
 \method{unique}{polylist}(x, incomparables = FALSE, \dots)
 }
 
@@ -27,7 +31,7 @@
   An object of class \code{polylist}
 }
 \references{None }
-\author{Kurt Hornik, slightly modified by Bill Venables }
+\author{Kurt Hornik, modified by Bill Venables }
 
 \examples{
 p <- poly.from.zeros(-3:4)
@@ -37,7 +41,6 @@ p6 <- c(p, p5)
 p6
 unique(p6)
 }
-
 
 \keyword{symbolmath }
 
