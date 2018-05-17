@@ -2,24 +2,20 @@
 \alias{PolynomF-package}
 \alias{PolynomF}
 \docType{package}
-\title{Univariate polynomial objects in R}
+\title{
+\packageTitle{PolynomF}
+}
 \description{
+\packageDescription{PolynomF}
+}
+\details{
   A package to implement a class of objects that behave like univariate
   polynomails.  Arithmetic operations (addition, subtraction,
   multiplication, division, remainder, raising to a non-negative integer
   power) are supported in a natural way.  The objects also act as R
   functions.  This package is a successor to the `polynom' package,
   but has a simpler and more convenient representation for the objects.
-  Like `polynom' it uses S3 classes and methods.}
-\details{
-  \tabular{ll}{
-    Package: \tab PolynomF\cr
-    Type: \tab Package\cr
-    Version: \tab 1.0\cr
-    Date: \tab 2008-05-05\cr
-    License: \tab GPL-2\cr
-    LazyLoad: \tab yes\cr
-  }
+  Like `polynom' it uses S3 classes and methods.
 
   The constructor function \code{polynom} is used to create polynomial
   objects from their coefficient vector, in power series order.  Once
@@ -35,18 +31,16 @@
   objects include simultaneous graphical display of all components and
   coercion to function.  The function may then be used to evaluate all
   all polynomials on the list simultaneously at the same argument.
-
 }
 \author{
-  Bill Venables, with some code inherited from the original \code{package}
-  by Bill Venables and Kurt Hornik.
-
-  Maintainer:  <Bill.Venables@gmail.com>
+\packageAuthor{PolynomF}
+Maintainer: \packageMaintainer{PolynomF}
 }
 \references{
-  None.
+None
 }
-\keyword{symbolmath}
+\keyword{ package }
+\keyword{ symbolmath }
 
 \examples{
 x <- polynom()
@@ -75,5 +69,4 @@ f <- function(i,j) stats::integrate(function(z)
       dnorm(z)*H[[i+1]](z)*H[[j+1]](z), -Inf, Inf)
 
 f(2,3)
-f(4,4)
-}
+f(4,4)}

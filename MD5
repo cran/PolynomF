@@ -1,10 +1,11 @@
-b0bb5b2469f143e814bbd810af3777d1 *DESCRIPTION
+b97c1f47fb3f0bcf249e22185cf6d49c *DESCRIPTION
 f747a8c6889c91764e011b409310f634 *NAMESPACE
 65df172aee75e59cbe31d21e13e7ad81 *R/PolynomF.R
+18d9fa7fa943f81539448923e2a01c2e *build/partial.rdb
 79f20a42711540ba192acd059c50f385 *man/GCD.Rd
 e77df4beada6b19ef57e07bc8646557d *man/Math.polynom.Rd
 4597416edddffa6f4bb09a36426229d8 *man/PolynomF-internal.Rd
-4eb1625756e1849659a26258a1f23c50 *man/PolynomF-package.Rd
+e65c2e8d2954aa236b39ad0ab80c23ef *man/PolynomF-package.Rd
 1768d6f13e0bdd4b7e7829943dab3a69 *man/as.character.polynom.Rd
 6a35e0d4b0264f8cb0a4f2f79f5cd0ab *man/as.function.polynom.Rd
 4eac9b6d22dce0b0de9151e7d6c30573 *man/c.polylist.Rd
