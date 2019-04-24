@@ -49,7 +49,7 @@ Nothing of interest, invisibly
 Plot methods for polynom or polylist objects
 }
 \examples{
-p <- poly.from.zeros((-3):4)
+p <- poly_from_zeros((-3):4)
 plot(p)
 lines(deriv(p), col = "red")
 }

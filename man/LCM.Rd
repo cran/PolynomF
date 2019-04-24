@@ -26,8 +26,8 @@ For a list of polynomials, find the lowest degree monic
 polynomial into which each divides exactly
 }
 \examples{
-p <- poly.calc(0:5)
-r <- poly.calc(1:6)
+p <- poly_calc(0:5)
+r <- poly_calc(1:6)
 greatest_common_divisor(p, r)
 solve(greatest_common_divisor(p, r))
 lowest_common_multiple(p, r)

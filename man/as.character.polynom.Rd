@@ -23,7 +23,7 @@ A character string representation of the polynomial
 Produce a text representation of a polynomial object
 }
 \examples{
-p <- poly.from.zeros(-2:3)
+p <- poly_from_zeros(-2:3)
 as.character(p, "z", FALSE)
 as.character(p, "z", TRUE)
 parse(text = as.character(p, "z", TRUE))[[1]]

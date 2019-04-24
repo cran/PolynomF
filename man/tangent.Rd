@@ -18,7 +18,7 @@ A linear polynomial giving the tangent line, or a list of such polynomials
 Find the tangent line to a polynomial at one or more x-points
 }
 \examples{
-p <- poly.from.zeros(c(0, 0:5, 4))
+p <- poly_from_zeros(c(0, 0:5, 4))
 plot(p, xlab = expression(italic(x)), ylab = expression(italic(P(x))),
   main = parse(text = paste("italic(P(x) ==",
                              as.character(p, decreasing = TRUE),")")))

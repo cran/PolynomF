@@ -26,8 +26,8 @@ Find a monic polynomial of maximal degree that divides each
 of a set of polynomials exactly
 }
 \examples{
-p <- poly.calc(0:5)
-r <- poly.calc(1:6)
+p <- poly_calc(0:5)
+r <- poly_calc(1:6)
 greatest_common_divisor(p, r)
 solve(greatest_common_divisor(p, r))
 lowest_common_multiple(p, r)

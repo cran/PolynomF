@@ -24,6 +24,6 @@ A list giving the zeros, stationary points and points of inflexion of the polyno
 Provide a succinct summary of the critical points of a polynomial, or list thereof
 }
 \examples{
-p <- poly.calc(0:5)
+p <- poly_calc(0:5)
 summary(p)
 }

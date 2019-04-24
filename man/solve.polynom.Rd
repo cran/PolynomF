@@ -22,7 +22,7 @@ Solve polynomial equations, a(x) = b(x), or alternatively
 find the zeros of the polynomial a(x) - b(x)
 }
 \examples{
-p <- poly.calc(0:5)
+p <- poly_calc(0:5)
 solve(p)
 solve(p, 1)
 }

@@ -26,7 +26,7 @@ coefficients fully exposed in the code and which evaluates
 the polynomial more efficiently.
 }
 \examples{
-p <- poly.from.zeros(-2:3)
+p <- poly_from_zeros(-2:3)
 p
 as.function(p)
 }

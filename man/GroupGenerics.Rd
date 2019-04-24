@@ -32,7 +32,7 @@ and \code{Math} for polynomial and polylist objects.  For \code{Summary}
 only \code{sum} and \code{prod} members are implemented
 }
 \examples{
-lis <- as.polylist(lapply(-2:3, function(x) polynom() - x))
+lis <- as_polylist(lapply(-2:3, function(x) polynomial() - x))
 prod(lis)
 sum(lis)
 solve(prod(lis))

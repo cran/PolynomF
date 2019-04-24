@@ -3,8 +3,9 @@
 #' @importFrom Rcpp sourceCpp
 NULL
 
-#' @importFrom stats deriv poly predict coef
+#' @importFrom stats deriv poly predict coef integrate dnorm setNames
 #' @importFrom graphics lines par plot points grid
+#' @importFrom methods hasArg
 NULL
 
 #' Polynomial construction
@@ -22,8 +23,8 @@ NULL
 #' @export
 #'
 #' @examples
-#' (x <- polynom())
-#' (p <- polynom(c(1, 5, 2, 2)/10))
+#' (x <- polynomial())
+#' (p <- polynomial(c(1, 5, 2, 2)/10))
 #' plot(p, xlim = 0:1, ylim = 0:1)
 #' P <- p
 #' for(j in 1:7) {
@@ -49,20 +50,40 @@ polynom <- function(a = c(0,1), ..., eps = 0) {
 
 #' @rdname polynom
 #' @export
-as.polynom <- function(a) {
+polynomial <- polynom
+
+#' @rdname polynom
+#' @export
+as_polynom <- function(a) {
   ### coercion to polynom
-  if(is.polynom(a)) a else polynom(as.vector(a))
+  if(is_polynom(a)) a else polynomial(as.vector(a))
+}
+
+#' @rdname polynom
+#' @export
+as.polynom <- function(a) {
+  .Deprecated("as_polynom")
+  ### coercion to polynom
+  if(is_polynom(a)) a else polynomial(as.vector(a))
+}
+
+#' @rdname polynom
+#' @export
+is_polynom <- function(a) {
+  ### predicate function
+  inherits(a, "polynom")
 }
 
 #' @rdname polynom
 #' @export
 is.polynom <- function(a) {
+  .Deprecated("is_polynom")
   ### predicate function
   inherits(a, "polynom")
 }
 
 .tangent <- function(x0, p) {
-  x <- polynom()
+  x <- polynomial()
   p(x0) + deriv(p)(x0)*(x - x0)
 }
 
@@ -77,7 +98,7 @@ is.polynom <- function(a) {
 #' @export
 #'
 #' @examples
-#' p <- poly.from.zeros(c(0, 0:5, 4))
+#' p <- poly_from_zeros(c(0, 0:5, 4))
 #' plot(p, xlab = expression(italic(x)), ylab = expression(italic(P(x))),
 #'   main = parse(text = paste("italic(P(x) ==",
 #'                              as.character(p, decreasing = TRUE),")")))
@@ -94,11 +115,11 @@ is.polynom <- function(a) {
 #'        pch = 19, col = c("dark green", "red"), lty = "solid",
 #'        cex = 0.7, bg = "beige", box.lwd = 0.25)
 tangent <- function(p, x0) {   ## the tangent line(s) to p(x) at x = x0
-  stopifnot(is.polynom(p), is.numeric(x0) && length(x0) > 0)
+  stopifnot(is_polynom(p), is.numeric(x0) && length(x0) > 0)
   if(length(x0) == 1) {
     .tangent(x0, p)
   } else {
-    as.polylist(lapply(x0, .tangent, p = p))
+    as_polylist(lapply(x0, .tangent, p = p))
   }
 }
 
@@ -126,7 +147,7 @@ tangent <- function(p, x0) {   ## the tangent line(s) to p(x) at x = x0
 #' @export
 #'
 #' @examples
-#' x <- polynom()
+#' x <- polynomial()
 #' (p <- (x-1)^5 - 1)
 #' (p1 <- (p + 1)/(x - 1)^2 - 1)
 #' for(i in 0:10) cat(coef((x+1)^i), "\n")
@@ -134,10 +155,10 @@ Ops.polynom <- function(e1, e2) {
   if(missing(e2))   ### unary operations
     return(switch(.Generic,
             "+" = e1,
-            "-" = polynom(-coef(e1)),
+            "-" = polynomial(-coef(e1)),
             stop("unsupported unary operation")))
-  e1 <- if(is.polynom(e1)) coef(e1) else as.numeric(e1)
-  e2 <- if(is.polynom(e2)) coef(e2) else as.numeric(e2)
+  e1 <- if(is_polynom(e1)) coef(e1) else as.numeric(e1)
+  e2 <- if(is_polynom(e2)) coef(e2) else as.numeric(e2)
   l1 <- length(e1)
   l2 <- length(e2)
   e1.op.e2 <-
@@ -176,7 +197,7 @@ Ops.polynom <- function(e1, e2) {
          "==" = return(l1 == l2 && all(e1 == e2)),
          "!=" = return(l1 != l2 || any(e1 != e2)),
          stop("unsupported operation on polynoms"))
-  polynom(e1.op.e2)
+  polynomial(e1.op.e2)
 }
 
 #' @rdname Ops.polynom
@@ -185,7 +206,7 @@ Ops.polylist <- function(e1, e2) {
   if(missing(e2))
     return(switch(.Generic,
       "+" = e1,
-      "-" = as.polylist(lapply(e1, "-")),
+      "-" = as_polylist(lapply(e1, "-")),
       stop("unknown unary operator!")))
   switch(.Generic,
   "+" =,
@@ -193,10 +214,10 @@ Ops.polylist <- function(e1, e2) {
   "*" =,
   "/" =,
   "%/%" =,
-  "%%" = as.polylist(mapply(.Generic, lapply(e1, as.polynom), lapply(e2, as.polynom))),
-  "^" = as.polylist(mapply(.Generic, lapply(e1, as.polynom), e2)),
+  "%%" = as_polylist(mapply(.Generic, lapply(e1, as_polynom), lapply(e2, as_polynom))),
+  "^" = as_polylist(mapply(.Generic, lapply(e1, as_polynom), e2)),
   "==" =,
-  "!=" = unlist(mapply(.Generic, lapply(e1, as.polynom), lapply(e2, as.polynom))),
+  "!=" = unlist(mapply(.Generic, lapply(e1, as_polynom), lapply(e2, as_polynom))),
   stop("unsupported operation on polynoms"))
 }
 
@@ -226,7 +247,7 @@ Ops.polylist <- function(e1, e2) {
 #' @export
 #'
 #' @examples
-#' lis <- as.polylist(lapply(-2:3, function(x) polynom() - x))
+#' lis <- as_polylist(lapply(-2:3, function(x) polynomial() - x))
 #' prod(lis)
 #' sum(lis)
 #' solve(prod(lis))
@@ -239,8 +260,8 @@ Summary.polynom <- function(..., na.rm = FALSE) {
     stop(gettextf("Generic '%s' not defined for '%s' objects.",
                   .Generic, .Class))
   switch(.Generic,
-         "sum" = .accumulate("+", polynom(0), polylist(...)),
-         "prod" = .accumulate("*", polynom(1), polylist(...)))
+         "sum" = .accumulate("+", polynomial(0), polylist(...)),
+         "prod" = .accumulate("*", polynomial(1), polylist(...)))
 }
 
 #' @rdname GroupGenerics
@@ -253,8 +274,8 @@ Summary.polylist <- function(..., na.rm = FALSE) {
     stop(gettextf("Generic '%s' not defined for \"%s\" objects.",
                   .Generic, .Class))
   switch(.Generic,
-         "sum" = .accumulate("+", polynom(0), c(...)),
-         "prod" = .accumulate("*", polynom(1), c(...)))
+         "sum" = .accumulate("+", polynomial(0), c(...)),
+         "prod" = .accumulate("*", polynomial(1), c(...)))
 }
 
 #' @rdname GroupGenerics
@@ -266,7 +287,7 @@ Math.polynom <- function(x, ...) {
          signif = ,
          floor = ,
          ceiling = ,
-         trunc = polynom(NextMethod(.Generic)),
+         trunc = polynomial(NextMethod(.Generic)),
          stop(paste(.Generic, "unsupported for polynoms")))
 }
 
@@ -289,12 +310,12 @@ Math.polylist <- function(x, ...) {
 #' @export
 #'
 #' @examples
-#' p <- poly.from.zeros(-2:3)
+#' p <- poly_from_zeros(-2:3)
 #' as.character(p, "z", FALSE)
 #' as.character(p, "z", TRUE)
 #' parse(text = as.character(p, "z", TRUE))[[1]]
 as.character.polynom <- function(x, variable = "x", decreasing = FALSE, ...) {
-  if(is.polynom(x)) p <- coef(x) else p <- unclass(x)
+  if(is_polynom(x)) p <- coef(x) else p <- unclass(x)
   lp <- length(p) - 1
   names(p) <- 0:lp
   p <- p[p != 0]
@@ -365,7 +386,7 @@ print.polynom <- function(x, variable = "x",
 #' @export
 #'
 #' @examples
-#' p <- poly.from.zeros(-2:3)
+#' p <- poly_from_zeros(-2:3)
 #' p
 #' as.function(p)
 as.function.polynom <- function (x, variable = "x", ...) {
@@ -403,7 +424,7 @@ as.function.polylist <- function(x, ...) {
 #' @export
 #'
 #' @examples
-#' p <- polynom(1:3)*polynom(5:1)
+#' p <- polynomial(1:3)*polynom(5:1)
 #' coef(p)
 coef.polynom <- function(object,...) {
   get("a", envir = environment(object))
@@ -436,7 +457,7 @@ deriv.polynom <- function(expr, ...) {
   if(length(expr) == 1)
     return(polynom(0))
   expr <- expr[-1]
-  polynom(expr * seq(along = expr))
+  polynomial(expr * seq(along = expr))
 }
 
 #' @rdname deriv.polynom
@@ -456,50 +477,15 @@ integral.default <- function(expr, ...) {
 #' @export
 integral.polynom <- function(expr, limits = NULL, ...) {
   expr <- coef(expr)
-  p <- polynom(c(0, expr/seq(along = expr)))
+  p <- polynomial(c(0, expr/seq(along = expr)))
   if(is.null(limits))
     p
   else
     diff(p(limits))
 }
 
-#' Orthogonal polynomials
-#'
-#' Generate a list of polynomials up to a specified degree,
-#' orthogonal with respect to the natural inner product
-#'
-#' @param x A numeric vector
-#' @param degree The desired maximum degree
-#' @param norm Logical: should polynomials be normalised to length one?
-#'
-#' @return A list of orthogonal polynomials
-#' @export
-#'
-#' @examples
-#' x <- c(0:3, 5)
-#' P <- poly.orth(x)
-#' plot(P)
-#' Pf <- as.function(P)
-#' zapsmall(crossprod(Pf(x)))
-poly.orth <- function(x, degree = length(unique(x)) - 1, norm = TRUE) {
-  at <- attr(poly(x, degree), "coefs")
-  a <- at$alpha
-  N <- at$norm2
-  x <- polynom()
-  p <- list(polynom(0), polynom(1))
-  for(j in 1:degree)
-    p[[j + 2]] <- (x - a[j]) * p[[j + 1]] - N[j + 1]/N[j] * p[[j]]
-  p <- p[-1]
-  if(norm) {
-    sqrtN <- sqrt(N[-1])
-    for(j in 1 + 0:degree) p[[j]] <- p[[j]]/sqrtN[j]
-  }
-  class(p) <- "polylist"
-  p
-}
-
 .polylist_from_list <- function(x) {
-  structure(lapply(x, as.polynom), class = "polylist")
+  structure(lapply(x, as_polynom), class = "polylist")
 }
 
 #' @rdname polynom
@@ -510,17 +496,34 @@ polylist <- function(...) {
 
 #' @rdname polynom
 #' @export
-is.polylist <- function(x) {
+is_polylist <- function(x) {
   inherits(x, "polylist")
 }
 
 #' @rdname polynom
 #' @export
-as.polylist <- function(x) {
-  if(is.polylist(x)) x
+is.polylist <- function(x) {
+  .Deprecated("is_polylist")
+  inherits(x, "polylist")
+}
+
+#' @rdname polynom
+#' @export
+as_polylist <- function(x) {
+  if(is_polylist(x)) x
   else if(is.list(x)) .polylist_from_list(x)
   else polylist(x)
 }
+
+#' @rdname polynom
+#' @export
+as.polylist <- function(x) {
+  .Deprecated("as_polylist")
+  if(is_polylist(x)) x
+  else if(is.list(x)) .polylist_from_list(x)
+  else polylist(x)
+}
+
 
 #' @rdname deriv.polynom
 #' @export
@@ -532,7 +535,7 @@ deriv.polylist <- function(expr, ...) {
 #' @export
 integral.polylist <- function(expr, ...) {
   result <- lapply(expr, integral, ...)
-  if (length(result) > 0 && is.polynom(result[[1]]))
+  if (length(result) > 0 && is_polynom(result[[1]]))
     class(result) <- class(expr)
   result
 }
@@ -566,8 +569,23 @@ plot.polylist <- function(x, xlim = 0:1, ylim = range(Px),
   plot(cbind(x, Px), xlab = xlab, ylab = ylab, type = "n",
        xlim = xlim, ylim = ylim, ...)
   grid(lty = "dashed")
-  for(i in seq(along = p))
-    lines(p[[i]], lty = i, col = i, ...)
+  if(!hasArg("lty") && !hasArg("col")) {
+    for(i in seq(along = p)) {
+      lines(p[[i]], lty = i, col = i, ...)
+    }
+  } else if(!hasArg("col")) {
+    for(i in seq(along = p)) {
+      lines(p[[i]], col = i, ...)
+    }
+  } else if(!hasArg("lty")) {
+    for(i in seq(along = p)) {
+      lines(p[[i]], lty = i, ...)
+    }
+  } else {
+    for(i in seq(along = p)) {
+      lines(p[[i]], ...)
+    }
+  }
   invisible()
 }
 
@@ -592,7 +610,7 @@ print.polylist <- function(x, ...) {
       }
     } else {
       for(n in nam) {
-        cat(paste("$\"", n, "\"\n", sep=""))
+        cat(paste("$", n, "\n", sep=""))
         print(x[[n]], ...)
         cat("\n")
       }
@@ -611,7 +629,7 @@ print.polylist <- function(x, ...) {
 #' @return A polylist object with all argumets included
 #' @export
 c.polynom <- function(..., recursive = FALSE) {
-  .polylist_from_list(unlist(lapply(list(...), as.polylist),
+  .polylist_from_list(unlist(lapply(list(...), as_polylist),
                              recursive = FALSE))
 }
 
@@ -664,7 +682,7 @@ unique.polylist <- function(x, incomparables = FALSE, ...) {
   .polylist_from_list(NextMethod("unique"))
 }
 
-#' Chenge origin of a polynomial
+#' Change origin of a polynomial
 #'
 #' Given a polynomial P(x) and a new origin \code{o}, find
 #' the polynomial Q(x) = P(x + o).  I.e. Q(0) = P(o)
@@ -675,27 +693,33 @@ unique.polylist <- function(x, incomparables = FALSE, ...) {
 #'
 #' @return A polynom or polylist object with x measured from the new origin
 #' @export
-change.origin <- function(p, o, ...) {
-  UseMethod("change.origin")
+change_origin <- function(p, o, ...) {
+  UseMethod("change_origin")
 }
 
-#' @rdname change.origin
+#' @rdname change_origin
 #' @export
-change.origin.default <- function(p, o, ...) {
+change.origin <- function(p, o, ...) {
+  .Deprecated("change_origin")
+  UseMethod("change_origin")
+}
+
+#' @rdname change_origin
+#' @export
+change_origin.default <- function(p, o, ...) {
   stop("unimplemented method")
 }
 
-#' @rdname change.origin
+#' @rdname change_origin
 #' @export
-change.origin.polynom <- function(p, o, ...) {
-  p(polynom() + as.numeric(o)[1])
+change_origin.polynom <- function(p, o, ...) {
+  p(polynomial() + as.numeric(o)[1])
 }
 
-
-#' @rdname change.origin
+#' @rdname change_origin
 #' @export
-change.origin.polylist <- function(p, o, ...) {
-  structure(lapply(p, change.origin, o = o), class = "polylist")
+change_origin.polylist <- function(p, o, ...) {
+  structure(lapply(p, change_origin, o = o), class = "polylist")
 }
 
 #' Plot method for polynomials
@@ -716,7 +740,7 @@ change.origin.polylist <- function(p, o, ...) {
 #' @export
 #'
 #' @examples
-#' p <- poly.from.zeros((-3):4)
+#' p <- poly_from_zeros((-3):4)
 #' plot(p)
 #' lines(deriv(p), col = "red")
 plot.polynom <- function(x, xlim = 0:1, ylim = range(Px),
@@ -812,13 +836,14 @@ points.polylist <- function(x, ..., len = 100) {
 #' @export
 #'
 #' @examples
-#' (p <- poly.calc(0:5)) ## same as poly.from.zeros(0:5)
-#' (p <- poly.calc(0:5, exp(0:5)))
+#' (p <- poly_calc(0:5)) ## same as poly_from_zeros(0:5)
+#' (p <- poly_calc(0:5, exp(0:5)))
 #' plot(p)
 #' curve(exp, add = TRUE, col = "red")
-poly.calc <- function(x, y,
+poly_calc <- function(x, y,
                       tol = sqrt(.Machine$double.eps),
                       lab = dimnames(y)[[2]]) {
+  stopifnot(is.numeric(x))
   if(missing(y) || all(y == 0)) { ## case 1: polynomial from zeros
     p <- 1
     for(xi in x)
@@ -851,22 +876,47 @@ poly.calc <- function(x, y,
   for(i in 1:m)
     r <- r + (y[i] * coef(Recall(x[ - i])))/prod(x[i] - x[ - i])
   r[abs(r) < tol] <- 0
-  polynom(r)
+  polynomial(r)
 }
 
-#' @rdname poly.calc
+#' @rdname poly_calc
+#' @export
+poly.calc <- function(...) {
+  .Deprecated("poly_calc")
+  poly_calc(...)
+}
+
+#' @rdname poly_calc
+#' @export
+poly_from_zeros <- function(...) {
+  poly_calc(unlist(list(...)))
+}
+
+#' @rdname poly_calc
+#' @export
+poly_from_roots <- poly_from_zeros
+
+#' @rdname poly_calc
 #' @export
 poly.from.zeros <- function(...) {
-  poly.calc(unlist(list(...)))
+  .Deprecated("poly_from_zeros")
+  poly_calc(...)
 }
 
-#' @rdname poly.calc
+#' @rdname poly_calc
 #' @export
-poly.from.roots <- poly.from.zeros
+poly.from.roots <- poly_from_zeros
 
-#' @rdname poly.calc
+#' @rdname poly_calc
 #' @export
-poly.from.values <- poly.calc
+poly_from_values <- poly_calc
+
+#' @rdname poly_calc
+#' @export
+poly.from.values <- function(...) {
+  .Deprecated("poly_from_values")
+  poly_calc(...)
+}
 
 #' Evaluate a polynomial
 #'
@@ -902,7 +952,7 @@ predict.polylist <- function(object, newdata, ...) {
 #' @export
 #'
 #' @examples
-#' p <- poly.calc(0:5)
+#' p <- poly_calc(0:5)
 #' solve(p)
 #' solve(p, 1)
 solve.polynom <- function(a, b, ...) {
@@ -947,7 +997,7 @@ solve.polylist <- function(a, b, ...) {
 #' @export
 #'
 #' @examples
-#' p <- poly.calc(0:5)
+#' p <- poly_calc(0:5)
 #' summary(p)
 summary.polynom <- function(object, ...) {
   dp <- deriv(object)
@@ -980,7 +1030,7 @@ print.summary.polynom <- function(x, ...) {
 
 .monic <- function(p) {
   a <- coef(p)
-  polynom(a/a[length(a)])
+  polynomial(a/a[length(a)])
 }
 
 .degree <- function(x) {
@@ -995,7 +1045,7 @@ print.summary.polynom <- function(x, ...) {
 
 .GCD2 <- function(x, y) {
   if(.effectively_zero(y)) x
-  else if(.degree(y) == 0) polynom(1)
+  else if(.degree(y) == 0) polynomial(1)
   else Recall(y, x %% y)
 }
 
@@ -1016,8 +1066,8 @@ print.summary.polynom <- function(x, ...) {
 #' @export
 #'
 #' @examples
-#' p <- poly.calc(0:5)
-#' r <- poly.calc(1:6)
+#' p <- poly_calc(0:5)
+#' r <- poly_calc(1:6)
 #' greatest_common_divisor(p, r)
 #' solve(greatest_common_divisor(p, r))
 #' lowest_common_multiple(p, r)
@@ -1057,8 +1107,8 @@ GCD.polylist <- GCD.polynom
 #' @export
 #'
 #' @examples
-#' p <- poly.calc(0:5)
-#' r <- poly.calc(1:6)
+#' p <- poly_calc(0:5)
+#' r <- poly_calc(1:6)
 #' greatest_common_divisor(p, r)
 #' solve(greatest_common_divisor(p, r))
 #' lowest_common_multiple(p, r)

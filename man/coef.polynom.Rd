@@ -21,6 +21,6 @@ A numeric vector of coefficients
 Extract polynomial coefficients
 }
 \examples{
-p <- polynom(1:3)*polynom(5:1)
+p <- polynomial(1:3)*polynom(5:1)
 coef(p)
 }

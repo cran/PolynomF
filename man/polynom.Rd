@@ -2,22 +2,37 @@
 % Please edit documentation in R/PolynomF.R
 \name{polynom}
 \alias{polynom}
+\alias{polynomial}
+\alias{as_polynom}
 \alias{as.polynom}
+\alias{is_polynom}
 \alias{is.polynom}
 \alias{polylist}
+\alias{is_polylist}
 \alias{is.polylist}
+\alias{as_polylist}
 \alias{as.polylist}
 \title{Polynomial construction}
 \usage{
 polynom(a = c(0, 1), ..., eps = 0)
 
+polynomial(a = c(0, 1), ..., eps = 0)
+
+as_polynom(a)
+
 as.polynom(a)
+
+is_polynom(a)
 
 is.polynom(a)
 
 polylist(...)
 
+is_polylist(x)
+
 is.polylist(x)
+
+as_polylist(x)
 
 as.polylist(x)
 }
@@ -39,8 +54,8 @@ A polynomial object.
 Functions to construct polynomial objects and check class membership
 }
 \examples{
-(x <- polynom())
-(p <- polynom(c(1, 5, 2, 2)/10))
+(x <- polynomial())
+(p <- polynomial(c(1, 5, 2, 2)/10))
 plot(p, xlim = 0:1, ylim = 0:1)
 P <- p
 for(j in 1:7) {
