@@ -1,10 +1,15 @@
+## usethis namespace: start
+#' @importFrom Rcpp sourceCpp
+## usethis namespace: end
+NULL
+
 ## revision of the polynomial class with a different representation
 #' @useDynLib PolynomF, .registration = TRUE
-#' @importFrom Rcpp sourceCpp
 NULL
 
 #' @importFrom stats deriv poly predict coef integrate dnorm setNames
-#' @importFrom graphics lines par plot points grid
+#' @importFrom graphics lines par plot points grid frame legend layout
+#' @importFrom grDevices palette
 #' @importFrom methods hasArg
 NULL
 
@@ -23,16 +28,27 @@ NULL
 #' @export
 #'
 #' @examples
-#' (x <- polynomial())
-#' (p <- polynomial(c(1, 5, 2, 2)/10))
-#' plot(p, xlim = 0:1, ylim = 0:1)
+#' (s <- polynomial())
+#' (p <- polynomial(c(1, 5, 4, 1)/11))
+#' oldPar <- par(mar = c(5,5,2,2)+0.1)
+#' plot(p, xlim = 0:1, ylim = 0:1, type = "n", bty="n",
+#'      xlab = "s", ylab = expression({P^(n)}(s)))
+#' lines(s, limits = 0:1)
 #' P <- p
 #' for(j in 1:7) {
-#'   lines(P, col = j)
+#'   lines(P, col = j+1, limits = 0:1)
 #'   P <- p(P)
 #' }
-#' (r <- solve(p-x))
-#' segments(r, 0, r, p(r), lty = "dashed")
+#' lines(P, limits = 0:1, col = 9)
+#' (r <- Re(solve((p-s)/(1-s))))
+#' arrows(r, p(r), r, par("usr")[3], lwd = 0.5,
+#'        length = 0.125, angle = 15)
+#' text(r, 0.025, paste("r =", format(r, digits = 3)))
+#' leg <- sapply(0:8, function(x) bquote({P^(.(x))}(s)))
+#' legend("topleft", legend = as.expression(leg),
+#'        lty = "solid", col = 1:9, bty = "n", ncol=3)
+#' par(oldPar)
+#' rm(leg, oldPar, p, P, r, s, j)
 polynom <- function(a = c(0,1), ..., eps = 0) {
   ### constructor function
   a <- as.numeric(a)
@@ -59,12 +75,24 @@ as_polynom <- function(a) {
   if(is_polynom(a)) a else polynomial(as.vector(a))
 }
 
-#' @rdname polynom
+#' Defunct functions
+#'
+#' These functions have been removed from the package
+#' to allow for systematic nomenclature.  Appropriate
+#' drop-in replacements are given if the function is
+#' called
+#'
+#' @name defunct
+#' @param a,p,x A numeric vector or polynom object
+#' @param o A numeric vector of length one.
+#' @param ... Additional arguments of appropriate class
+#'
+#' @return An error is triggered and appropriate error message is returned
 #' @export
 as.polynom <- function(a) {
-  .Deprecated("as_polynom")
+  .Defunct("as_polynom")
   ### coercion to polynom
-  if(is_polynom(a)) a else polynomial(as.vector(a))
+  ## if(is_polynom(a)) a else polynomial(as.vector(a))
 }
 
 #' @rdname polynom
@@ -74,12 +102,12 @@ is_polynom <- function(a) {
   inherits(a, "polynom")
 }
 
-#' @rdname polynom
+#' @rdname defunct
 #' @export
 is.polynom <- function(a) {
-  .Deprecated("is_polynom")
+  .Defunct("is_polynom")
   ### predicate function
-  inherits(a, "polynom")
+  ## inherits(a, "polynom")
 }
 
 .tangent <- function(x0, p) {
@@ -294,7 +322,12 @@ Math.polynom <- function(x, ...) {
 #' @rdname GroupGenerics
 #' @export
 Math.polylist <- function(x, ...) {
-  sapply(x, .Generic, ...)
+  out <- sapply(x, .Generic, ...)
+  if(is.list(out) && identical(unique(sapply(out, class)), "polynom")) {
+    as_polylist(out)
+  } else {
+    out
+  }
 }
 
 #' Polynomial coercion to character
@@ -424,7 +457,7 @@ as.function.polylist <- function(x, ...) {
 #' @export
 #'
 #' @examples
-#' p <- polynomial(1:3)*polynom(5:1)
+#' p <- polynomial(1:3)*polynomial(5:1)
 #' coef(p)
 coef.polynom <- function(object,...) {
   get("a", envir = environment(object))
@@ -448,14 +481,14 @@ coef.polylist <- function(object, ...) {
 #' @export
 #'
 #' @examples
-#' p <- poly.from.roots(-2:3)
+#' p <- poly_from_roots(-2:3)
 #' p
 #' deriv(p)
 #' integral(p)
 deriv.polynom <- function(expr, ...) {
   expr <- coef(expr)
   if(length(expr) == 1)
-    return(polynom(0))
+    return(polynomial(0))
   expr <- expr[-1]
   polynomial(expr * seq(along = expr))
 }
@@ -500,11 +533,11 @@ is_polylist <- function(x) {
   inherits(x, "polylist")
 }
 
-#' @rdname polynom
+#' @rdname defunct
 #' @export
 is.polylist <- function(x) {
-  .Deprecated("is_polylist")
-  inherits(x, "polylist")
+  .Defunct("is_polylist")
+  ## inherits(x, "polylist")
 }
 
 #' @rdname polynom
@@ -515,28 +548,36 @@ as_polylist <- function(x) {
   else polylist(x)
 }
 
-#' @rdname polynom
+#' @rdname defunct
 #' @export
 as.polylist <- function(x) {
-  .Deprecated("as_polylist")
-  if(is_polylist(x)) x
-  else if(is.list(x)) .polylist_from_list(x)
-  else polylist(x)
+  .Defunct("as_polylist")
+  # if(is_polylist(x)) x
+  # else if(is.list(x)) .polylist_from_list(x)
+  # else polylist(x)
 }
 
 
 #' @rdname deriv.polynom
 #' @export
 deriv.polylist <- function(expr, ...) {
-  structure(lapply(expr, deriv), class = class(expr))
+  result <- structure(lapply(expr, deriv), class = class(expr))
+  if(!is.null(names(expr))) {
+    names(result) <- paste("d", names(result), sep = "_")
+  }
+  result
 }
 
 #' @rdname deriv.polynom
 #' @export
 integral.polylist <- function(expr, ...) {
   result <- lapply(expr, integral, ...)
-  if (length(result) > 0 && is_polynom(result[[1]]))
+  if (length(result) > 0 && is_polynom(result[[1]])) {
     class(result) <- class(expr)
+  }
+  if(!is.null(names(expr))) {
+    names(result) <- paste("int", names(result), sep = "_")
+  }
   result
 }
 
@@ -544,7 +585,28 @@ integral.polylist <- function(expr, ...) {
 #' @export
 plot.polylist <- function(x, xlim = 0:1, ylim = range(Px),
                           type = "l", xlab = "x", ylab = "P(x)",
-                          ..., len = 1000) {
+                          ...,
+                          col = seq_along(x),
+                          lty = if(length(col) == 1)
+                            seq_along(x) else "solid", len = 1000,
+                          legend = FALSE) {
+  if(identical(palette(),
+               c("black", "red", "green3", "blue", "cyan",
+                 "magenta", "yellow", "gray"))) {
+    palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33",
+              "#A65628", "#F781BF", "#999999"))
+    on.exit(palette("default"))
+  }
+  if(legend) {
+    layout(rbind(1:2), widths = c(9, 2))
+    on.exit(layout(matrix(1)), add = TRUE)
+    oldMar <- par(mar = c(4, 5, 4, 1)+0.1)
+    on.exit(par(oldMar), add = TRUE)
+    if(is.null(names(x)))
+      names(x) <- paste0("P", seq_along(x)-1)
+  }
+  lty <- rep_len(lty, length.out = length(x))
+  col <- rep_len(col, length.out = length(x))
   p <- x
   if(missing(xlim)) {
     ## try to cover the "interesting" region
@@ -569,22 +631,15 @@ plot.polylist <- function(x, xlim = 0:1, ylim = range(Px),
   plot(cbind(x, Px), xlab = xlab, ylab = ylab, type = "n",
        xlim = xlim, ylim = ylim, ...)
   grid(lty = "dashed")
-  if(!hasArg("lty") && !hasArg("col")) {
-    for(i in seq(along = p)) {
-      lines(p[[i]], lty = i, col = i, ...)
-    }
-  } else if(!hasArg("col")) {
-    for(i in seq(along = p)) {
-      lines(p[[i]], col = i, ...)
-    }
-  } else if(!hasArg("lty")) {
-    for(i in seq(along = p)) {
-      lines(p[[i]], lty = i, ...)
-    }
-  } else {
-    for(i in seq(along = p)) {
-      lines(p[[i]], ...)
-    }
+  for(i in seq(along = p)) {
+    lines(p[[i]], lty = lty[i], col = col[i], ...)
+  }
+  if(legend) {
+    oldPar <- par(usr = c(0,1,0,1), mar = c(0,0,0,0))
+    on.exit(par(oldPar), add = TRUE, after = FALSE)
+    frame()
+    legend("left", legend = names(p), lty = lty,
+           col = col, bty = "n", lwd = 2)
   }
   invisible()
 }
@@ -697,11 +752,11 @@ change_origin <- function(p, o, ...) {
   UseMethod("change_origin")
 }
 
-#' @rdname change_origin
+#' @rdname defunct
 #' @export
 change.origin <- function(p, o, ...) {
-  .Deprecated("change_origin")
-  UseMethod("change_origin")
+  .Defunct("change_origin")
+  ## UseMethod("change_origin")
 }
 
 #' @rdname change_origin
@@ -730,11 +785,12 @@ change_origin.polylist <- function(p, o, ...) {
 #' @param xlim,ylim as for graphics::plot
 #' @param type as for graphics::plot
 #' @param xlab,ylab as for graphics::plot
-#' @param ... additional arguments passed on t methods
+#' @param ... additional arguments passed on to methods
 #' @param len positive integer defining the point or curve resolution
 #' @param limits x-limits for the polynomial, default: the entire plot.
 #'        For polylist objects this may be a two column matrix.
 #' @param col,lty Colour(s) and line type(s) as for graphics::plot
+#' @param legend logical: for "polylist" objects, should a legend be drawn alongside the main plot?
 #'
 #' @return Nothing of interest, invisibly
 #' @export
@@ -794,7 +850,18 @@ points.polynom <- function(x, ..., len = 100, limits = pu[1:2])  {
 #' @rdname plot.polynom
 #' @export
 lines.polylist <- function(x, ..., len = 1000, limits = pu[1:2],
-                           col = seq_along(x), lty = seq_along(x)) {
+                           col = seq_along(x),
+                           lty = if(length(col) == 1) seq_along(x) else
+                             "solid") {
+  if(identical(palette(),
+               c("black", "red", "green3", "blue", "cyan",
+                 "magenta", "yellow", "gray"))) {
+    palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33",
+              "#A65628", "#F781BF", "#999999"))
+    on.exit(palette("default"))
+  }
+  lty <- rep_len(lty, length.out = length(x))
+  col <- rep_len(col, length.out = length(x))
   n <- length(x)
   col <- rep_len(col, length.out = n)
   lty <- rep_len(lty, length.out = n)
@@ -813,6 +880,13 @@ lines.polylist <- function(x, ..., len = 1000, limits = pu[1:2],
 #' @rdname plot.polynom
 #' @export
 points.polylist <- function(x, ..., len = 100) {
+  if(identical(palette(),
+               c("black", "red", "green3", "blue", "cyan",
+                 "magenta", "yellow", "gray"))) {
+    palette(c("#E41A1C", "#377EB8", "#4DAF4A", "#984EA3", "#FF7F00", "#FFFF33",
+              "#A65628", "#F781BF", "#999999"))
+    on.exit(palette("default"))
+  }
   for(i in seq(along = x)) {
     points(x[[i]], pch = i, col = i, len = len, ...)
   }
@@ -848,7 +922,7 @@ poly_calc <- function(x, y,
     p <- 1
     for(xi in x)
       p <- c(0, p) - c(xi * p, 0)
-    return(polynom(p))
+    return(polynomial(p))
   }                ## case 2: Lagrange interpolating polynomial
   if(is.matrix(y)) {
     if(length(x) != nrow(y))
@@ -871,7 +945,7 @@ poly_calc <- function(x, y,
   if((m <- length(x)) != length(y))
     stop("x and y(x) do not match in length!")
   if(m <= 1)
-    return(polynom(y))
+    return(polynomial(y))
   r <- 0
   for(i in 1:m)
     r <- r + (y[i] * coef(Recall(x[ - i])))/prod(x[i] - x[ - i])
@@ -879,11 +953,11 @@ poly_calc <- function(x, y,
   polynomial(r)
 }
 
-#' @rdname poly_calc
+#' @rdname defunct
 #' @export
 poly.calc <- function(...) {
-  .Deprecated("poly_calc")
-  poly_calc(...)
+  .Defunct("poly_calc")
+  ## poly_calc(...)
 }
 
 #' @rdname poly_calc
@@ -896,11 +970,11 @@ poly_from_zeros <- function(...) {
 #' @export
 poly_from_roots <- poly_from_zeros
 
-#' @rdname poly_calc
+#' @rdname defunct
 #' @export
 poly.from.zeros <- function(...) {
-  .Deprecated("poly_from_zeros")
-  poly_calc(...)
+  .Defunct("poly_from_zeros")
+ ## poly_calc(...)
 }
 
 #' @rdname poly_calc
@@ -911,11 +985,11 @@ poly.from.roots <- poly_from_zeros
 #' @export
 poly_from_values <- poly_calc
 
-#' @rdname poly_calc
+#' @rdname defunct
 #' @export
 poly.from.values <- function(...) {
-  .Deprecated("poly_from_values")
-  poly_calc(...)
+  .Defunct("poly_from_values")
+  ## poly_calc(...)
 }
 
 #' Evaluate a polynomial
@@ -982,8 +1056,15 @@ solve.polynom <- function(a, b, ...) {
 #' @rdname solve.polynom
 #' @export
 solve.polylist <- function(a, b, ...) {
-  if(!missing(b)) lapply(a, solve.polynom, b) else
+  result <- if(missing(b)) {
     lapply(a, solve.polynom)
+  } else {
+    lapply(a-b, solve.polynom)
+  }
+  if(!is.null(names(a))) {
+    names(result) <- paste(names(a), "zeros", sep="_")
+  }
+  result
 }
 
 #' Polynomial summary
@@ -1051,7 +1132,7 @@ print.summary.polynom <- function(x, ...) {
 
 .LCM2 <- function(x, y) {
   if(.effectively_zero(x) || .effectively_zero(y))
-    return(polynom(0))
+    return(polynomial(0))
   (x / .GCD2(x, y)) * y
 }
 

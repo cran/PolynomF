@@ -35,7 +35,7 @@ A coeffieient vector, or list thereof
 Find the derivative or indefinite integral of a polynomial object, or list thereof.
 }
 \examples{
-p <- poly.from.roots(-2:3)
+p <- poly_from_roots(-2:3)
 p
 deriv(p)
 integral(p)

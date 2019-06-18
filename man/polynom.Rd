@@ -4,14 +4,10 @@
 \alias{polynom}
 \alias{polynomial}
 \alias{as_polynom}
-\alias{as.polynom}
 \alias{is_polynom}
-\alias{is.polynom}
 \alias{polylist}
 \alias{is_polylist}
-\alias{is.polylist}
 \alias{as_polylist}
-\alias{as.polylist}
 \title{Polynomial construction}
 \usage{
 polynom(a = c(0, 1), ..., eps = 0)
@@ -20,21 +16,13 @@ polynomial(a = c(0, 1), ..., eps = 0)
 
 as_polynom(a)
 
-as.polynom(a)
-
 is_polynom(a)
-
-is.polynom(a)
 
 polylist(...)
 
 is_polylist(x)
 
-is.polylist(x)
-
 as_polylist(x)
-
-as.polylist(x)
 }
 \arguments{
 \item{a}{A \code{polynom} object, or a numeric vector of coefficients
@@ -54,14 +42,25 @@ A polynomial object.
 Functions to construct polynomial objects and check class membership
 }
 \examples{
-(x <- polynomial())
-(p <- polynomial(c(1, 5, 2, 2)/10))
-plot(p, xlim = 0:1, ylim = 0:1)
+(s <- polynomial())
+(p <- polynomial(c(1, 5, 4, 1)/11))
+oldPar <- par(mar = c(5,5,2,2)+0.1)
+plot(p, xlim = 0:1, ylim = 0:1, type = "n", bty="n",
+     xlab = "s", ylab = expression({P^(n)}(s)))
+lines(s, limits = 0:1)
 P <- p
 for(j in 1:7) {
-  lines(P, col = j)
+  lines(P, col = j+1, limits = 0:1)
   P <- p(P)
 }
-(r <- solve(p-x))
-segments(r, 0, r, p(r), lty = "dashed")
+lines(P, limits = 0:1, col = 9)
+(r <- Re(solve((p-s)/(1-s))))
+arrows(r, p(r), r, par("usr")[3], lwd = 0.5,
+       length = 0.125, angle = 15)
+text(r, 0.025, paste("r =", format(r, digits = 3)))
+leg <- sapply(0:8, function(x) bquote({P^(.(x))}(s)))
+legend("topleft", legend = as.expression(leg),
+       lty = "solid", col = 1:9, bty = "n", ncol=3)
+par(oldPar)
+rm(leg, oldPar, p, P, r, s, j)
 }

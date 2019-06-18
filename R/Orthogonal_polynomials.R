@@ -23,8 +23,8 @@ poly_orth <- function(x, degree = length(unique(x)) - 1, norm = TRUE) {
   at <- attr(poly(x, degree), "coefs")
   a <- at$alpha
   N <- at$norm2
-  x <- polynom()
-  p <- polylist(polynom(0), polynom(1))
+  x <- polynomial()
+  p <- polylist(polynomial(0), polynomial(1))
   for(j in 1:degree) {
     p[[j + 2]] <- (x - a[j]) * p[[j + 1]] - N[j + 1]/N[j] * p[[j]]
   }
@@ -41,58 +41,9 @@ poly_orth <- function(x, degree = length(unique(x)) - 1, norm = TRUE) {
 #' @rdname poly_orth
 #' @export
 poly.orth <- function(...) {
-  .Deprecated("poly_orth")
-  poly_orth(...)
+  .Defunct("poly_orth")
+  ## poly_orth(...)
 }
-
-# #' @rdname poly_orth
-# #' @param weights A numeric vector of non-negative weights (default: all 1).
-# #' @param ... Arguments transferred to \code{poly_orth}.
-# #' @export
-# poly_orth_weighted <- local({
-#   x <- 0
-#   w <- 1
-#   ip <- function(p1, p2 = p1) {
-#     sum(w*p1(x)*p2(x))
-#   }
-#   normalize <- function(p) {
-#     p/sqrt(ip(p))
-#   }
-#   function(x, degree = length(unique(x[w > 0])) - 1, weights = 1,
-#            norm = TRUE) {
-#
-#     weights <- rep_len(weights, length.out = length(x))
-#     x <<- x
-#     stopifnot(is.numeric(x) &&
-#                 (length(unique(x)) > 0))
-#     stopifnot(is.numeric(weights) &&
-#                 all(weights >= 0))
-#     w <<- weights/mean(weights)
-#     stopifnot(is.numeric(degree) &&
-#                 (length(degree) == 1) &&
-#                 ((degree %% 1) == 0) &&
-#                 (degree >= 0))
-#     OP <- polylist(polynom(0), polynom(1))
-#     if(degree == 0) {
-#       return(OP[-1])
-#     }
-#     z <- polynom()
-#     pn1 <- 1
-#     pnn <- ip(OP[[2]])
-#     for(j in 1:degree) {
-#       an <- ip(OP[[j+1]], z*OP[[j+1]])/pnn
-#       bn <- pnn/pn1
-#       OP[[j+2]] <- (z - an)*OP[[j+1]] - bn*OP[[j]]
-#       pn1 <- pnn
-#       pnn <- ip(OP[[j+2]])
-#     }
-#     OP <- OP[-1]
-#     if(norm) {
-#       OP <- as_polylist(lapply(OP, normalize))
-#     }
-#     OP
-#   }
-# })
 
 #' General Orthogonal Polynomials
 #'
@@ -137,11 +88,11 @@ poly_orth_general <- function(inner_product, degree, norm = FALSE, ...) {
               (length(degree) == 1) &&
               ((degree %% 1) == 0) &&
               (degree >= 0))
-  OP <- polylist(polynom(0), polynom(1))
+  OP <- polylist(polynomial(0), polynomial(1))
   if(degree == 0) {
     return(OP[-1])
   }
-  z <- polynom()
+  z <- polynomial()
   pn1 <- 1
   pnn <- inner_product(OP[[2]], ...)
   for(j in 1:degree) {
@@ -161,33 +112,42 @@ poly_orth_general <- function(inner_product, degree, norm = FALSE, ...) {
 #' @rdname poly_orth_general
 #' @export
 Hermite <- function(p, q = p) {
-  integrate(function(x) dnorm(x)*p(x)*q(x), lower = -Inf, upper = Inf)$value
+  integrate(function(x) dnorm(x)*p(x)*q(x),
+            rel.tol = .Machine$double.eps^0.5,
+            lower = -Inf, upper = Inf)$value
 }
 
 #' @rdname poly_orth_general
 #' @export
 Legendre <- function(p, q = p) {
-  integral(p*q, limits = c(-1,1))
+  integral(p*q, limits = c(-1, 1))
 }
 
 #' @rdname poly_orth_general
 #' @export
-Chebyshev <- function(p, q = p) {
-  integrate(function(x) sqrt(1 - x^2)*p(x)*q(x), lower = -1, upper = 1)$value
+ChebyshevT <- function(p, q = p) {
+  Jacobi(p, q, alpha = -0.5)
 }
 
 #' @rdname poly_orth_general
 #' @export
-Jacobi <- function(p, q = p, alpha = 0.5, beta = 0.5) {
-  integrate(function(x) (1-x)^alpha*(1 + x)^beta*p(x)*q(x), lower = -1, upper = 1)$value
+ChebyshevU <- function(p, q = p) {
+  Jacobi(p, q, alpha = 0.5)
 }
 
 #' @rdname poly_orth_general
 #' @export
-Discrete <- function(p, q = p, x, w = function(x) rep(1, length(x))) {
-  sum(w(x)*p(x)*q(x))
+Jacobi <- function(p, q = p, alpha = -0.5, beta = alpha) {
+  integrate(function(x) (1 - x)^alpha*(1 + x)^beta*p(x)*q(x),
+            rel.tol = .Machine$double.eps^0.5,
+            lower = -1, upper = 1)$value
 }
 
+#' @rdname poly_orth_general
+#' @export
+Discrete <- function(p, q = p, x, w = function(x, ...) 1, ...) {
+  sum(w(x, ...)*p(x)*q(x))
+}
 
 #' Remove minuscule coefficients
 #'
@@ -204,7 +164,7 @@ Discrete <- function(p, q = p, x, w = function(x) rep(1, length(x))) {
 #'
 #' @examples
 #' (P <- poly_orth(-2:2, norm = FALSE))
-#' zap(P)
+#' zap(35*P)
 zap <- function(x, digits = getOption("digits")) {
   UseMethod("zap")
 }
@@ -216,7 +176,7 @@ zap.default <- base::zapsmall
 #' @rdname zap
 #' @export
 zap.polynom <- function(x, digits = getOption("digits")) {
-  polynom(base::zapsmall(coef(x), digits))
+  polynomial(base::zapsmall(coef(x), digits))
 }
 
 #' @rdname zap
@@ -224,3 +184,11 @@ zap.polynom <- function(x, digits = getOption("digits")) {
 zap.polylist <- function(x, digits = getOption("digits")) {
   as_polylist(lapply(x, zap.polynom, digits))
 }
+
+#' @rdname zap
+#' @export
+zap.list <- function(x, digits = getOption("digits")) {
+  lapply(x, zap, digits = digits)
+}
+
+

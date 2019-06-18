@@ -4,7 +4,8 @@
 \alias{poly_orth_general}
 \alias{Hermite}
 \alias{Legendre}
-\alias{Chebyshev}
+\alias{ChebyshevT}
+\alias{ChebyshevU}
 \alias{Jacobi}
 \alias{Discrete}
 \title{General Orthogonal Polynomials}
@@ -15,11 +16,13 @@ Hermite(p, q = p)
 
 Legendre(p, q = p)
 
-Chebyshev(p, q = p)
+ChebyshevT(p, q = p)
 
-Jacobi(p, q = p, alpha = 0.5, beta = 0.5)
+ChebyshevU(p, q = p)
 
-Discrete(p, q = p, x, w = function(x) rep(1, length(x)))
+Jacobi(p, q = p, alpha = -0.5, beta = alpha)
+
+Discrete(p, q = p, x, w = function(x, ...) 1, ...)
 }
 \arguments{
 \item{inner_product}{An R function of two \code{"polynom"} arguments

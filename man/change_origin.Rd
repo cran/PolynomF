@@ -2,15 +2,12 @@
 % Please edit documentation in R/PolynomF.R
 \name{change_origin}
 \alias{change_origin}
-\alias{change.origin}
 \alias{change_origin.default}
 \alias{change_origin.polynom}
 \alias{change_origin.polylist}
 \title{Change origin of a polynomial}
 \usage{
 change_origin(p, o, ...)
-
-change.origin(p, o, ...)
 
 \method{change_origin}{default}(p, o, ...)
 

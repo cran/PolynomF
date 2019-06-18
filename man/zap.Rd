@@ -5,6 +5,7 @@
 \alias{zap.default}
 \alias{zap.polynom}
 \alias{zap.polylist}
+\alias{zap.list}
 \title{Remove minuscule coefficients}
 \usage{
 zap(x, digits = getOption("digits"))
@@ -14,6 +15,8 @@ zap(x, digits = getOption("digits"))
 \method{zap}{polynom}(x, digits = getOption("digits"))
 
 \method{zap}{polylist}(x, digits = getOption("digits"))
+
+\method{zap}{list}(x, digits = getOption("digits"))
 }
 \arguments{
 \item{x}{A polynomial or polylist object}
@@ -32,5 +35,5 @@ to the function \code{base::zapsmall}, to which this is a front-end.
 }
 \examples{
 (P <- poly_orth(-2:2, norm = FALSE))
-zap(P)
+zap(35*P)
 }

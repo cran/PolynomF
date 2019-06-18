@@ -2,32 +2,23 @@
 % Please edit documentation in R/PolynomF.R
 \name{poly_calc}
 \alias{poly_calc}
-\alias{poly.calc}
 \alias{poly_from_zeros}
 \alias{poly_from_roots}
-\alias{poly.from.zeros}
 \alias{poly.from.roots}
 \alias{poly_from_values}
-\alias{poly.from.values}
 \title{Lagrange interpolation polynomial}
 \usage{
 poly_calc(x, y, tol = sqrt(.Machine$double.eps),
   lab = dimnames(y)[[2]])
 
-poly.calc(...)
-
 poly_from_zeros(...)
 
 poly_from_roots(...)
-
-poly.from.zeros(...)
 
 poly.from.roots(...)
 
 poly_from_values(x, y, tol = sqrt(.Machine$double.eps),
   lab = dimnames(y)[[2]])
-
-poly.from.values(...)
 }
 \arguments{
 \item{x}{A numeric vector of x-points at which the y-values are specified.}
