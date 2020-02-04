@@ -2,12 +2,9 @@
 % Please edit documentation in R/Orthogonal_polynomials.R
 \name{poly_orth}
 \alias{poly_orth}
-\alias{poly.orth}
 \title{Simpl orthogonal polynomials}
 \usage{
 poly_orth(x, degree = length(unique(x)) - 1, norm = TRUE)
-
-poly.orth(...)
 }
 \arguments{
 \item{x}{A numeric vector}
@@ -15,8 +12,6 @@ poly.orth(...)
 \item{degree}{The desired maximum degree}
 
 \item{norm}{Logical: should polynomials be normalised to length one?}
-
-\item{...}{Arguments passed on to the non-deprecated function.}
 }
 \value{
 A list of orthogonal polynomials as a polylist object

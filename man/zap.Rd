@@ -22,8 +22,6 @@ zap(x, digits = getOption("digits"))
 \item{x}{A polynomial or polylist object}
 
 \item{digits}{As for \code{base::zapsmall}}
-
-\item{...}{Passed on to \code{base::zapsmall}}
 }
 \value{
 A polynomial or polylist object with minuscule coefficients set to zero.

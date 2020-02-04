@@ -1,4 +1,4 @@
-## ----setup, include = FALSE----------------------------------------------
+## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(collapse = TRUE,
                       comment = "",
                       fig.height = 5.5,
@@ -26,20 +26,20 @@ setHook("plot.new",
         "replace")
 
 
-## ---- echo=FALSE---------------------------------------------------------
+## ---- echo=FALSE--------------------------------------------------------------
 old <- paste0("`", ls("package:PolynomF", pattern = "\\."), "`")
 new <- gsub("\\.", "_", old)
 tab <- data.frame(`Old name` = old, `New name` = new, check.names = FALSE)
 kable(tab, caption = "Function name changes in version 2.0-0")
 
-## ---- fig.width = 8, out.height="0.25\\textheight"-----------------------
+## ---- fig.width = 8, out.height="0.25\\textheight"----------------------------
 Discrete <- function(p, q = p, x, w = function(x, ...) 1, ...) sum(w(x, ...)*p(x)*q(x))
 PC <- poly_orth_general(inner_product = Discrete, degree = 4, 
                         x = 0:100, w = dpois, lambda = 1)
 plot(PC, lwd = 2, legend = TRUE)
 title(main = "Poisson-Charlier(1) polynomials to degree 4", font.main = 3)
 
-## ---- out.height="0.23\\textheight"--------------------------------------
+## ---- out.height="0.23\\textheight"-------------------------------------------
 (p1 <- poly_calc(1:6))       ## a monic polynomial with given zeros
 solve(p1)                    ## check that the zeros are as specified
 polyroot(coef(p1))           ## check using the Traub-Jenkins algorithm
@@ -73,7 +73,7 @@ plot(op, lwd = 2, legend = TRUE)
 fop <- as.function(op)        ## Explicit coercion needed for polylist
 zap(crossprod(fop(x0)))       ## Verify orthonormality
 
-## ---- out.height="0.26\\textheight"--------------------------------------
+## ---- out.height="0.26\\textheight"-------------------------------------------
 x <- polynomial()
 Tr <- polylist(1, x)
 for(j in 3:15) {
@@ -81,7 +81,7 @@ for(j in 3:15) {
 }
 Tr <- setNames(Tr, paste0("T", sub(" ", "_", format(seq_along(Tr)-1))))
 
-## ------------------------------------------------------------------------
+## -----------------------------------------------------------------------------
 ChebyT <- function(p, q = p) {
   integrate(function(x) 1/sqrt(1-x^2)*p(x)*q(x), lower = -1, upper = 1,
             subdivisions = 500, rel.tol = .Machine$double.eps^0.5)$value
@@ -105,7 +105,7 @@ lines(Fx_approx, col = "red", limits = c(-1,1))
 curve(1e4*(Fx(x) - Fx_approx(x)), xlim = c(-1,1)) ## error pattern x 10000
 
 
-## ---- fig.height = 5, fig.width = 7, out.height = "0.26\\textheight"-----
+## ---- fig.height = 5, fig.width = 7, out.height = "0.26\\textheight"----------
 x <- polynomial()
 Ur <- polylist(1, 2*x)
 
@@ -153,7 +153,7 @@ lines(P(P(P)),    col = 3, limits = 0:1)
 lines(P(P(P(P))), col = 4, limits = 0:1)
 arrows(ex, P(ex), ex, par("usr")[3], angle = 15, length = 0.125)
 
-## ---- fig.height = 5, fig.width = 6.5, out.height = "0.31\\textheight"----
+## ---- fig.height = 5, fig.width = 6.5, out.height = "0.31\\textheight"--------
 x0 <- 80:89
 y0 <- c(487, 370, 361, 313, 246, 234, 173, 128, 88, 83)
 p <- poly_calc(x0, y0)        ## leads to catastropic numerical failure!

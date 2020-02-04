@@ -4,21 +4,18 @@
 \alias{poly_calc}
 \alias{poly_from_zeros}
 \alias{poly_from_roots}
-\alias{poly.from.roots}
 \alias{poly_from_values}
 \title{Lagrange interpolation polynomial}
 \usage{
-poly_calc(x, y, tol = sqrt(.Machine$double.eps),
-  lab = dimnames(y)[[2]])
+poly_calc(x, y, tol = sqrt(.Machine$double.eps), lab = dimnames(y)[[2]])
 
 poly_from_zeros(...)
 
 poly_from_roots(...)
 
-poly.from.roots(...)
+poly_from_roots(...)
 
-poly_from_values(x, y, tol = sqrt(.Machine$double.eps),
-  lab = dimnames(y)[[2]])
+poly_from_values(x, y, tol = sqrt(.Machine$double.eps), lab = dimnames(y)[[2]])
 }
 \arguments{
 \item{x}{A numeric vector of x-points at which the y-values are specified.}

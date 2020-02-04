@@ -24,5 +24,5 @@ Group generic function to implement arithmetic operations on polynomial objects
 x <- polynomial()
 (p <- (x-1)^5 - 1)
 (p1 <- (p + 1)/(x - 1)^2 - 1)
-for(i in 0:10) cat(coef((x+1)^i), "\\n")
+for(i in 0:10) cat(coef((x+1)^i), "\n")
 }

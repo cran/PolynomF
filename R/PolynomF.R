@@ -75,25 +75,25 @@ as_polynom <- function(a) {
   if(is_polynom(a)) a else polynomial(as.vector(a))
 }
 
-#' Defunct functions
-#'
-#' These functions have been removed from the package
-#' to allow for systematic nomenclature.  Appropriate
-#' drop-in replacements are given if the function is
-#' called
-#'
-#' @name defunct
-#' @param a,p,x A numeric vector or polynom object
-#' @param o A numeric vector of length one.
-#' @param ... Additional arguments of appropriate class
-#'
-#' @return An error is triggered and appropriate error message is returned
-#' @export
-as.polynom <- function(a) {
-  .Defunct("as_polynom")
-  ### coercion to polynom
-  ## if(is_polynom(a)) a else polynomial(as.vector(a))
-}
+## #' Defunct functions
+## #'
+## #' These functions have been removed from the package
+## #' to allow for systematic nomenclature.  Appropriate
+## #' drop-in replacements are given if the function is
+## #' called
+## #'
+## #' @name defunct
+## #' @param a,p,x A numeric vector or polynom object
+## #' @param o A numeric vector of length one.
+## #' @param ... Additional arguments of appropriate class
+## #'
+## #' @return An error is triggered and appropriate error message is returned
+## #' @export
+## as.polynom <- function(a) {
+##   .Defunct("as_polynom")
+##   ### coercion to polynom
+##   ## if(is_polynom(a)) a else polynomial(as.vector(a))
+## }
 
 #' @rdname polynom
 #' @export
@@ -102,13 +102,13 @@ is_polynom <- function(a) {
   inherits(a, "polynom")
 }
 
-#' @rdname defunct
-#' @export
-is.polynom <- function(a) {
-  .Defunct("is_polynom")
-  ### predicate function
-  ## inherits(a, "polynom")
-}
+## #' @rdname defunct
+## #' @export
+## is.polynom <- function(a) {
+##   .Defunct("is_polynom")
+##   ### predicate function
+##   ## inherits(a, "polynom")
+## }
 
 .tangent <- function(x0, p) {
   x <- polynomial()
@@ -533,12 +533,12 @@ is_polylist <- function(x) {
   inherits(x, "polylist")
 }
 
-#' @rdname defunct
-#' @export
-is.polylist <- function(x) {
-  .Defunct("is_polylist")
-  ## inherits(x, "polylist")
-}
+## #' @rdname defunct
+## #' @export
+## is.polylist <- function(x) {
+##   .Defunct("is_polylist")
+##   ## inherits(x, "polylist")
+## }
 
 #' @rdname polynom
 #' @export
@@ -548,14 +548,14 @@ as_polylist <- function(x) {
   else polylist(x)
 }
 
-#' @rdname defunct
-#' @export
-as.polylist <- function(x) {
-  .Defunct("as_polylist")
-  # if(is_polylist(x)) x
-  # else if(is.list(x)) .polylist_from_list(x)
-  # else polylist(x)
-}
+## #' @rdname defunct
+## #' @export
+## as.polylist <- function(x) {
+##   .Defunct("as_polylist")
+##   # if(is_polylist(x)) x
+##   # else if(is.list(x)) .polylist_from_list(x)
+##   # else polylist(x)
+## }
 
 
 #' @rdname deriv.polynom
@@ -752,12 +752,12 @@ change_origin <- function(p, o, ...) {
   UseMethod("change_origin")
 }
 
-#' @rdname defunct
-#' @export
-change.origin <- function(p, o, ...) {
-  .Defunct("change_origin")
-  ## UseMethod("change_origin")
-}
+## #' @rdname defunct
+## #' @export
+## change.origin <- function(p, o, ...) {
+##   .Defunct("change_origin")
+##   ## UseMethod("change_origin")
+## }
 
 #' @rdname change_origin
 #' @export
@@ -953,12 +953,12 @@ poly_calc <- function(x, y,
   polynomial(r)
 }
 
-#' @rdname defunct
-#' @export
-poly.calc <- function(...) {
-  .Defunct("poly_calc")
-  ## poly_calc(...)
-}
+## #' @rdname defunct
+## #' @export
+## poly.calc <- function(...) {
+##   .Defunct("poly_calc")
+##   ## poly_calc(...)
+## }
 
 #' @rdname poly_calc
 #' @export
@@ -970,27 +970,27 @@ poly_from_zeros <- function(...) {
 #' @export
 poly_from_roots <- poly_from_zeros
 
-#' @rdname defunct
-#' @export
-poly.from.zeros <- function(...) {
-  .Defunct("poly_from_zeros")
- ## poly_calc(...)
-}
+## #' @rdname defunct
+## #' @export
+## poly.from.zeros <- function(...) {
+##   .Defunct("poly_from_zeros")
+##  ## poly_calc(...)
+## }
 
 #' @rdname poly_calc
 #' @export
-poly.from.roots <- poly_from_zeros
+poly_from_roots <- poly_from_zeros
 
 #' @rdname poly_calc
 #' @export
 poly_from_values <- poly_calc
 
-#' @rdname defunct
-#' @export
-poly.from.values <- function(...) {
-  .Defunct("poly_from_values")
-  ## poly_calc(...)
-}
+## #' @rdname defunct
+## #' @export
+## poly.from.values <- function(...) {
+##   .Defunct("poly_from_values")
+##   ## poly_calc(...)
+## }
 
 #' Evaluate a polynomial
 #'

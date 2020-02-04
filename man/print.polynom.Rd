@@ -4,8 +4,7 @@
 \alias{print.polynom}
 \title{Print method for polynomial objects}
 \usage{
-\method{print}{polynom}(x, variable = "x",
-  digits = getOption("digits"), decreasing = FALSE, ...)
+\method{print}{polynom}(x, variable = "x", digits = getOption("digits"), decreasing = FALSE, ...)
 }
 \arguments{
 \item{x}{A polynomial object}

@@ -8,7 +8,6 @@
 #' @param x A numeric vector
 #' @param degree The desired maximum degree
 #' @param norm Logical: should polynomials be normalised to length one?
-#' @param ... Arguments passed on to the non-deprecated function.
 #'
 #' @return A list of orthogonal polynomials as a polylist object
 #' @export
@@ -38,12 +37,12 @@ poly_orth <- function(x, degree = length(unique(x)) - 1, norm = TRUE) {
   setNames(p, paste0("P", 0:degree))
 }
 
-#' @rdname poly_orth
-#' @export
-poly.orth <- function(...) {
-  .Defunct("poly_orth")
-  ## poly_orth(...)
-}
+## #' @rdname poly_orth
+## #' @export
+## poly.orth <- function(...) {
+##   .Defunct("poly_orth")
+##   ## poly_orth(...)
+## }
 
 #' General Orthogonal Polynomials
 #'
@@ -157,7 +156,6 @@ Discrete <- function(p, q = p, x, w = function(x, ...) 1, ...) {
 #'
 #' @param x A polynomial or polylist object
 #' @param digits As for \code{base::zapsmall}
-#' @param ... Passed on to \code{base::zapsmall}
 #'
 #' @return A polynomial or polylist object with minuscule coefficients set to zero.
 #' @export

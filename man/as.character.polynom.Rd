@@ -4,8 +4,7 @@
 \alias{as.character.polynom}
 \title{Polynomial coercion to character}
 \usage{
-\method{as.character}{polynom}(x, variable = "x", decreasing = FALSE,
-  ...)
+\method{as.character}{polynom}(x, variable = "x", decreasing = FALSE, ...)
 }
 \arguments{
 \item{x}{The polynomial object in question}

@@ -9,21 +9,44 @@
 \alias{points.polylist}
 \title{Plot method for polynomials}
 \usage{
-\method{plot}{polylist}(x, xlim = 0:1, ylim = range(Px), type = "l",
-  xlab = "x", ylab = "P(x)", ..., col = seq_along(x), lty = if
-  (length(col) == 1) seq_along(x) else "solid", len = 1000,
-  legend = FALSE)
+\method{plot}{polylist}(
+  x,
+  xlim = 0:1,
+  ylim = range(Px),
+  type = "l",
+  xlab = "x",
+  ylab = "P(x)",
+  ...,
+  col = seq_along(x),
+  lty = if (length(col) == 1) seq_along(x) else "solid",
+  len = 1000,
+  legend = FALSE
+)
 
-\method{plot}{polynom}(x, xlim = 0:1, ylim = range(Px), type = "l",
-  xlab = "x", ylab = "p(x)", ..., len = 1000, limits = pu[1:2])
+\method{plot}{polynom}(
+  x,
+  xlim = 0:1,
+  ylim = range(Px),
+  type = "l",
+  xlab = "x",
+  ylab = "p(x)",
+  ...,
+  len = 1000,
+  limits = pu[1:2]
+)
 
 \method{lines}{polynom}(x, ..., len = 1000, limits = pu[1:2])
 
 \method{points}{polynom}(x, ..., len = 100, limits = pu[1:2])
 
-\method{lines}{polylist}(x, ..., len = 1000, limits = pu[1:2],
-  col = seq_along(x), lty = if (length(col) == 1) seq_along(x) else
-  "solid")
+\method{lines}{polylist}(
+  x,
+  ...,
+  len = 1000,
+  limits = pu[1:2],
+  col = seq_along(x),
+  lty = if (length(col) == 1) seq_along(x) else "solid"
+)
 
 \method{points}{polylist}(x, ..., len = 100)
 }
