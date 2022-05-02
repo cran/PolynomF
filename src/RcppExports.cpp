@@ -5,6 +5,11 @@
 
 using namespace Rcpp;
 
+#ifdef RCPP_USE_GLOBAL_ROSTREAM
+Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
+Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
+#endif
+
 // poly_divide
 List poly_divide(NumericVector Num0, NumericVector Den);
 RcppExport SEXP _PolynomF_poly_divide(SEXP Num0SEXP, SEXP DenSEXP) {
