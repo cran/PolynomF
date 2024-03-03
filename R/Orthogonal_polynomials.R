@@ -169,7 +169,8 @@ zap <- function(x, digits = getOption("digits")) {
 
 #' @rdname zap
 #' @export
-zap.default <- base::zapsmall
+zap.default <- function (x, digits = getOption("digits"))
+  base::zapsmall(x, digits)
 
 #' @rdname zap
 #' @export

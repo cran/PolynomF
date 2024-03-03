@@ -1,13 +1,13 @@
-f8f60e7e24b7841c0e7e494708240c20 *DESCRIPTION
+7982c04c5d9ad792891fe15a64d1504d *DESCRIPTION
 a162fc26914bd74e98ef482cf63acd30 *NAMESPACE
-d63e941a3c627614a28760527a716978 *R/Orthogonal_polynomials.R
+f9e3fece5316c704f7f06ebeec2d1866 *R/Orthogonal_polynomials.R
 ecf58a477f8ba24a8ac420087a36e953 *R/PolynomF.R
-580eed8e0a963d43354d7262e15badb4 *R/RcppExports.R
+734526ae6f2108efbaeddf885e725289 *R/RcppExports.R
 1f66a21e9685961e9dc7db4e66b30fe6 *R/nevilles_algorithm.R
-fbd3b90b002bc395d172f18e4cf209f3 *build/vignette.rds
-713d2fccc9082327d6a4d3adad59a4d6 *inst/doc/polynomials.R
-a48ddfb1eb3f4ff74f0c0e9e085ade0c *inst/doc/polynomials.Rmd
-ee3bb750a2ba7e41d2abd1b7d7033686 *inst/doc/polynomials.html
+118a75f316d91fb16e8a702194b8f349 *build/vignette.rds
+a62626149a21560673426c190a9f4005 *inst/doc/polynomials.R
+b4f41b102ecc20027570bcecf4114b6c *inst/doc/polynomials.Rmd
+cb34e4302aa72ec3adc3b452289dcfdf *inst/doc/polynomials.html
 54c2e663f7b94ee96677bb1de4031d77 *man/GCD.Rd
 1db36179c613bbef33429fc1f26088c2 *man/GroupGenerics.Rd
 122d7580af1ebe92127e7039eb2b2b3c *man/LCM.Rd
@@ -37,4 +37,4 @@ d943bcb739f44cd71d30fbbc0a289391 *man/unique.polylist.Rd
 8cbde0649bccffb1a4883227bb0cdc51 *src/RcppExports.cpp
 2807d72c9b7b42196c88d6e5bd6f335e *src/poly_divide.cpp
 29b3c1cd5afd54ae3b56054e11c5d446 *vignettes/header.tex
-a48ddfb1eb3f4ff74f0c0e9e085ade0c *vignettes/polynomials.Rmd
+b4f41b102ecc20027570bcecf4114b6c *vignettes/polynomials.Rmd

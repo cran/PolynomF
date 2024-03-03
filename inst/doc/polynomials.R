@@ -1,8 +1,8 @@
 ## ----setup, include = FALSE---------------------------------------------------
 knitr::opts_chunk$set(collapse = TRUE,
                       comment = "",
-                      fig.height = 5.5,
-                      fig.width = 7)
+                      fig.height = 4.5,
+                      fig.width = 6)
 if(knitr::is_latex_output()) {
   knitr::opts_chunk$set(fig.align = "center",
                         out.height = "30%")
@@ -11,7 +11,7 @@ library(PolynomF)
 library(knitr)
 setHook("plot.new",
         list(las = function() par(las = 1),
-             pch = function() par(pch = 16)),
+             pch = function() par(pch = 20)),
         "append")
 curve <- function(..., add = FALSE, n = 1001, type = "l") {
   if(add) {
@@ -22,13 +22,13 @@ curve <- function(..., add = FALSE, n = 1001, type = "l") {
     graphics::curve(..., add = TRUE, n = 1001, type = type)
   }
 }
-setHook("plot.new",
-        list(las = function() par(las = 1),
-             pch = function() par(pch = 20)),
-        "replace")
+# setHook("plot.new",
+#         list(las = function() par(las = 1),
+#              pch = function() par(pch = 20)),
+#         "replace")
 
 
-## ---- fig.width = 8-----------------------------------------------------------
+## ----fig.width = 8------------------------------------------------------------
 Discrete <- function(p, q = p, x, w = function(x, ...) 1, ...) sum(w(x, ...)*p(x)*q(x))
 PC <- poly_orth_general(inner_product = Discrete, degree = 4, 
                         x = 0:100, w = dpois, lambda = 1)
@@ -137,8 +137,8 @@ segments(x, y, 1-y, x, lty = "solid", lwd = 0.2)
 lines(s, limits = 0:1, col = "grey")
 lines(P, limits = 0:1)
 lines(tangent(P, 1), col = "red", limits = c(0.5, 1.0), lwd = 1.5)
-(ep <- solve((P - s)/(1 - s))) ## extinction; factor our the known zero at s = 1
-ex <- ep[2]                 ## extract the appropriate value (may be complex, in general)
+ep <- solve((P - s)/(1 - s)) ## extinction; factor our the known zero at s = 1
+(sg <- ep[ep > 0 & ep < 1])  ## extract the appropriate value (may be complex, in general)
 plot(s, xlim = c(0,1), ylim = c(0,1), type = "n", bty = "n", main = pretty_poly,
      xlab = expression(italic(s)), ylab = expression(italic(P)(italic(s))))
 segments(x, y, 1-y, x, lty = "solid", lwd = 0.2)
@@ -147,20 +147,36 @@ lines(P,          col = 1, limits = 0:1)
 lines(P(P),       col = 2, limits = 0:1)
 lines(P(P(P)),    col = 3, limits = 0:1)
 lines(P(P(P(P))), col = 4, limits = 0:1)
-arrows(ex, P(ex), ex, par("usr")[3], angle = 15, length = 0.125)
+arrows(sg, P(sg), sg, par("usr")[3], angle = 15, length = 0.125)
+text(sg, 0.025, bquote(sigma == .(round(sg, 4))), pos = 4, adj = 0, cex = 0.7)
 
 ## -----------------------------------------------------------------------------
 x0 <- 80:89
 y0 <- c(487, 370, 361, 313, 246, 234, 173, 128, 88, 83)
-p <- poly_calc(x0, y0)        ## leads to catastropic numerical failure!
-range(p(x0) - y0)             ## these should be "close to zero"!
-p1 <- poly_calc(x0 - 84, y0)  ## changing origin fixes the problem
-range(p1(x0 - 84) - y0)       ## these are 'close to zero'.
-plot(p1, xlim = c(80, 89) - 84, xlab = "x0 - 84")
-points(x0 - 84, y0, col = "red")
-## Can we now write the polynomial in "raw" form?
-p0 <- change_origin(p1, -84)  ## attempting to change the origin back to zero
-                              ## leads to severe numerical problems again
-plot(p0, xlim = c(80, 89))
-points(x0, y0, col = "red")   ## major errors due to finite precision
+p <- poly_calc(x0, y0)          ## leads to catastropic numerical failure!
+range(p(x0) - y0)               ## these should be "close to zero"!
+##
+## Try another algorithm for finding the Lagrange interpolating polynomial
+##
+pn <- neville(x0, y0)                             ## Neville's algorithm
+range(pn(x0) - y0)                 
+pl <- lagrange(x0, y0)                            ## lagrange's formula
+range(pl(x0) - y0)
+##
+## Try by relocating the x-values for computational purposes.
+##
+pr <- local({
+  .p <- poly_calc(x0 - 84, y0)  ## changing origin fixes the problem
+  function(x) {
+    .p(x - 84)
+  }
+})
+range(pr(x0) - y0)       ## these are 'close to zero'.
+plot(p, xlim = c(80, 89), ylim = c(-100, 800), bty = "n")    ## this looks ugly!
+lines(pn, col = 2, xpd = NA)                                 ## Just as bad!
+lines(pl, col = 3, xpd = NA)                                 ## but different.
+curve(pr, add = TRUE, lwd = 2, col = 4)                      ## Success at last!
+points(x0, y0, col = 1)
+legend("top", legend = c("poly_calc", "neville", "lagrange", "relocation"),
+       lty = "solid", col = 1:4, cex = 0.7, title = "Method", ncol = 2)
 
